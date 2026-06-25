@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { mergeOptions, resolveOptions } from './options';
+import { mergeOptions, resolveOptions, resolvePerStep } from './options';
 
 describe('resolveOptions', () => {
   it('applies defaults', () => {
@@ -58,6 +58,18 @@ describe('mergePadding scalar override', () => {
     // exercises line 20: typeof override !== 'object' → { left: override, right: override }
     const r = mergeOptions({ padding: { left: '1rem', right: '1rem' } }, { padding: '2rem' });
     expect(r.padding).toEqual({ left: '2rem', right: '2rem' });
+  });
+});
+
+describe('resolvePerStep', () => {
+  it('returns 1 when a grid is configured', () => {
+    expect(resolvePerStep({ grid: { dimensions: [[1, 2]] } })).toBe(1);
+  });
+  it('returns perMove when no grid', () => {
+    expect(resolvePerStep({ perMove: 3 })).toBe(3);
+  });
+  it('defaults to 1 with no grid and no perMove', () => {
+    expect(resolvePerStep({})).toBe(1);
   });
 });
 

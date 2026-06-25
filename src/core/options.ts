@@ -46,6 +46,10 @@ export function mergeOptions(
   };
 }
 
+export function resolvePerStep(options: Pick<SliderOptions, 'grid' | 'perMove'>): number {
+  return options.grid ? 1 : (options.perMove ?? 1);
+}
+
 export function resolveOptions(
   options: SliderOptions,
   viewportWidth: number | null

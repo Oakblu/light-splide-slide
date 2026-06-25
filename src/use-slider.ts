@@ -7,6 +7,7 @@ import {
   getReachablePageCount,
   resolveNextIndex,
   resolveOptions,
+  resolvePerStep,
 } from './core';
 import { createResponsiveStore } from './responsive-store';
 import {
@@ -101,8 +102,7 @@ export function useSlider({
           pageElements.map((page) => page.offsetLeft),
           maxScrollLeft
         ) - 1;
-      // v8 ignore next -- branch coverage for grid ternary is unreliably tracked in vitest multi-project setup
-      const perMove = resolvedOptions.grid ? 1 : (resolvedOptions.perMove ?? 1);
+      const perMove = resolvePerStep(resolvedOptions);
       const next = resolveNextIndex({ control, currentIndex: currentIndexRef.current, perMove });
       const clamped = Math.max(0, Math.min(next, maxIndex));
       if (clamped === currentIndexRef.current) {
@@ -241,8 +241,7 @@ export function useSlider({
     };
   }, [goTo, onMounted, onDestroy]);
 
-  // v8 ignore next -- branch coverage for grid ternary is unreliably tracked in vitest multi-project setup
-  const perStep = resolvedOptions.grid ? 1 : (resolvedOptions.perMove ?? 1);
+  const perStep = resolvePerStep(resolvedOptions);
   // Prefer measured reachable positions; fall back to option math before measurement / on the server.
   const maxIndex =
     reachableCount !== null ? reachableCount - 1 : getMaxIndex(resolvedOptions, pageCount);
