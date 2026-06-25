@@ -28,6 +28,29 @@ it('flat mode: renders each slide with data-carousel-page', () => {
   expect(pages).toHaveLength(4);
 });
 
+it('grid pages fill the viewport width (one page per view, not collapsed)', () => {
+  const { container } = render(
+    <div style={{ width: '600px' }}>
+      <Slider aria-label="grid-width" options={{ grid: { dimensions: [[2, 3]] } }}>
+        <SliderTrack>
+          {Array.from({ length: 10 }, (_, i) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: stable test fixture
+            <SliderSlide key={`g-${i}`}>{i}</SliderSlide>
+          ))}
+        </SliderTrack>
+      </Slider>
+    </div>
+  );
+  const scroll = container.querySelector<HTMLElement>('[data-slider-scroll]');
+  const pages = [...container.querySelectorAll<HTMLElement>('[data-carousel-page="true"]')];
+  expect(pages).toHaveLength(2);
+  // Each grid page must span (about) the viewport width; collapsed pages would be
+  // a fraction of it, packing both pages side-by-side (the bug).
+  for (const page of pages) {
+    expect(page.getBoundingClientRect().width).toBeGreaterThan((scroll?.clientWidth ?? 0) * 0.9);
+  }
+});
+
 it('grid mode via options.grid.dimensions: groups into pages', () => {
   // dimensions: [[2,2]] → 4 items per page → 6 slides → 2 pages
   const { container } = makeSlider({ grid: { dimensions: [[2, 2]] } }, 6);
