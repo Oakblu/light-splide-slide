@@ -1,6 +1,7 @@
 'use client';
-import { type ReactNode, useEffect, useLayoutEffect, useRef } from 'react';
+import { type ReactNode, useEffect, useRef } from 'react';
 import { computeScrollStyle } from '../core';
+import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect';
 import { SliderContext } from '../slider-context';
 import type { SliderApi, SliderOptions } from '../types';
 import { useSlider } from '../use-slider';
@@ -21,7 +22,7 @@ export function SliderRuntime({ options, onMounted, onDestroy, children }: Slide
   // Register the scroll element synchronously (layout phase) so that the event
   // listeners in useScrollSync / useReachableCount / useLastChildVisibility —
   // which fire in the subsequent effect phase — see a non-null scrollElementRef.
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const root = rootRef.current;
     // v8 ignore next 3 -- ref is always set before layout effects run; guard is defensive for the unmount edge case
     if (!root) {
@@ -29,7 +30,7 @@ export function SliderRuntime({ options, onMounted, onDestroy, children }: Slide
     }
     const scroll = root.querySelector<HTMLDivElement>('[data-slider-scroll]');
     registerScrollElement(scroll);
-  });
+  }, [registerScrollElement]);
 
   // Measure the DOM after every render: report the current page count. This is
   // idempotent (setPageCount dedups in the store), so re-running on each render is
