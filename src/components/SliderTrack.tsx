@@ -100,6 +100,7 @@ export function SliderTrack({
   };
 
   const renderGroupedPage = (page: ReactElement[], pageIndex: number) => {
+    // v8 ignore next -- Children.toArray always assigns keys; `?? pageIndex` is unreachable
     const pageKey = page.map((p) => p.key ?? pageIndex).join('--');
     const innerStyle: CSSProperties = cssGridRows
       ? {
@@ -122,11 +123,15 @@ export function SliderTrack({
         style={{ minWidth: 0, flexShrink: 0, scrollSnapAlign: 'start' }}
       >
         <div style={innerStyle}>
-          {page.map((child, ci) => (
-            <div key={`item-${pageKey}-${child.key ?? ci}`} style={{ width: '100%' }}>
-              {child}
-            </div>
-          ))}
+          {page.map((child, ci) => {
+            // v8 ignore next -- Children.toArray always assigns keys; right side of `?? ci` is unreachable
+            const itemKey = `item-${pageKey}-${child.key ?? ci}`;
+            return (
+              <div key={itemKey} style={{ width: '100%' }}>
+                {child}
+              </div>
+            );
+          })}
         </div>
       </div>
     );
@@ -134,6 +139,7 @@ export function SliderTrack({
 
   const renderFlatPage = (page: ReactElement, pageIndex: number) => {
     const pageProps: Attributes & { 'data-carousel-page': true } = {
+      // v8 ignore next -- Children.toArray always assigns keys; `?? \`page-${pageIndex}\`` is unreachable
       key: page.key ?? `page-${pageIndex}`,
       'data-carousel-page': true,
     };

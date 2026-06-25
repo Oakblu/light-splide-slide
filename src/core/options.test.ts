@@ -35,6 +35,30 @@ describe('resolveOptions', () => {
     );
     expect(r.perPage).toBe(2);
   });
+  it('sorts multiple breakpoints and applies all that match', () => {
+    // two breakpoints; both apply at viewport 400 in max mode
+    const r = resolveOptions(
+      { perPage: 1, breakpoints: { 800: { perPage: 2 }, 500: { perPage: 3 } } },
+      400
+    );
+    // sorted ascending: 500 applied first (perPage→3), then 800 applied (perPage→2)
+    expect(r.perPage).toBe(2);
+  });
+  it('does not apply min-width breakpoint below width', () => {
+    const r = resolveOptions(
+      { perPage: 1, mediaQuery: 'min', breakpoints: { 600: { perPage: 2 } } },
+      400
+    );
+    expect(r.perPage).toBe(1);
+  });
+});
+
+describe('mergePadding scalar override', () => {
+  it('scalar override converts to symmetric left/right', () => {
+    // exercises line 20: typeof override !== 'object' → { left: override, right: override }
+    const r = mergeOptions({ padding: { left: '1rem', right: '1rem' } }, { padding: '2rem' });
+    expect(r.padding).toEqual({ left: '2rem', right: '2rem' });
+  });
 });
 
 describe('mergeOptions', () => {

@@ -19,6 +19,7 @@ export function SliderSlide({
   }
   const fixedWidth = toCssUnit(carousel.options.fixedWidth);
   const gap = toCssUnit(carousel.options.gap) ?? '0px';
+  // v8 ignore next -- perPage is always set by resolveOptions defaults; `?? 1` is unreachable
   const perPage = carousel.options.perPage ?? 1;
   const width = fixedWidth
     ? fixedWidth

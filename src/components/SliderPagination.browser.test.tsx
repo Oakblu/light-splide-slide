@@ -33,3 +33,25 @@ it('renders nothing when pagination disabled', () => {
   );
   expect(container.querySelectorAll('[data-slider-dot]')).toHaveLength(0);
 });
+
+it('renderDot render prop is called for each dot', () => {
+  const { container } = render(
+    <Slider aria-label="d" options={{ perPage: 1, pagination: true }}>
+      <SliderTrack>
+        <SliderSlide>a</SliderSlide>
+        <SliderSlide>b</SliderSlide>
+      </SliderTrack>
+      <SliderPagination
+        renderDot={({ index, current }: { index: number; current: boolean }) => (
+          <button type="button" data-dot-index={index} data-dot-current={current}>
+            {index}
+          </button>
+        )}
+      />
+    </Slider>
+  );
+  const dots = container.querySelectorAll('[data-dot-index]');
+  expect(dots).toHaveLength(2);
+  expect(dots[0].getAttribute('data-dot-current')).toBe('true');
+  expect(dots[1].getAttribute('data-dot-current')).toBe('false');
+});

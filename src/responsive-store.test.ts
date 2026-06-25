@@ -32,4 +32,21 @@ describe('createResponsiveStore', () => {
     expect(cb).toHaveBeenCalled();
     vi.unstubAllGlobals();
   });
+
+  it('unsubscribe removes the resize listener when window exists', () => {
+    const listeners = new Set<() => void>();
+    const fakeWindow = {
+      innerWidth: 1024,
+      addEventListener: (_: string, cb: () => void) => listeners.add(cb),
+      removeEventListener: (_: string, cb: () => void) => listeners.delete(cb),
+    };
+    vi.stubGlobal('window', fakeWindow);
+    const store = createResponsiveStore();
+    const cb = vi.fn();
+    const unsub = store.subscribe(cb);
+    expect(listeners.size).toBe(1);
+    unsub();
+    expect(listeners.size).toBe(0);
+    vi.unstubAllGlobals();
+  });
 });

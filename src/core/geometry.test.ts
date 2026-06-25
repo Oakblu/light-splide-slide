@@ -89,4 +89,37 @@ describe('getNearestPageIndex', () => {
     expect(getNearestPageIndex(els, 90)).toBe(1);
     expect(getNearestPageIndex(els, 10)).toBe(0);
   });
+  it('returns 0 for a single element regardless of scrollLeft', () => {
+    // branch: single element always wins (best starts as 0, no other candidate)
+    expect(getNearestPageIndex([{ offsetLeft: 50 }], 0)).toBe(0);
+    expect(getNearestPageIndex([{ offsetLeft: 50 }], 200)).toBe(0);
+  });
+  it('returns last index when scrollLeft is past the last element', () => {
+    const els: { offsetLeft: number }[] = [
+      { offsetLeft: 0 },
+      { offsetLeft: 100 },
+      { offsetLeft: 200 },
+    ];
+    expect(getNearestPageIndex(els, 210)).toBe(2);
+  });
+});
+
+describe('getMaxIndex extra', () => {
+  it('returns 0 when pageCount is 0', () => {
+    expect(getMaxIndex({ perPage: 1 }, 0)).toBe(0);
+  });
+  it('returns 0 in grid mode with 0 pages', () => {
+    expect(getMaxIndex({ grid: { dimensions: [[1, 2]] } }, 0)).toBe(0);
+  });
+  it('defaults perPage to 1 when not provided', () => {
+    // exercises the `?? 1` branch on line 34
+    expect(getMaxIndex({}, 4)).toBe(3);
+  });
+});
+
+describe('getPaginationCount extra', () => {
+  it('defaults perPage to 1 when not provided', () => {
+    // exercises the `?? 1` branch on line 23
+    expect(getPaginationCount({}, 4)).toBe(4);
+  });
 });

@@ -22,6 +22,7 @@ type SliderArrowsProps = {
   renderNext?: RenderButton;
 };
 
+/* v8 ignore next -- defensive fallback; disabled buttons never fire click so noop is never invoked */
 const noop = () => {};
 
 export function SliderArrows({
