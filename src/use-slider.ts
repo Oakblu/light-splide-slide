@@ -30,7 +30,14 @@ export function useSlider({
   onMounted,
   onDestroy,
 }: UseSliderParams): SliderContextValue {
-  const store = useMemo(() => createResponsiveStore(), []);
+  const breakpointWidths = useMemo(
+    () => Object.keys(options.breakpoints ?? {}).map(Number),
+    [options.breakpoints]
+  );
+  const store = useMemo(
+    () => createResponsiveStore(breakpointWidths, options.mediaQuery),
+    [breakpointWidths, options.mediaQuery]
+  );
   const viewportWidth = useSyncExternalStore(
     store.subscribe,
     store.getSnapshot,
