@@ -555,6 +555,7 @@ it('loop: go(99) past maxIndex wraps to 0', () => {
       }}
     />
   );
+  api.current?.go(1); // move away from 0 so go(99) must actually wrap
   api.current?.go(99);
   expect(api.current?.index).toBe(0);
 });
