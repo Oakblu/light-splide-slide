@@ -37,7 +37,7 @@ function Counter({ setPageCount }: { setPageCount: (n: number) => void }) {
   return null;
 }
 
-it('starts at index 0 with correct nav state', () => {
+it('starts at index 0 with correct nav state', async () => {
   const captured: { current: SliderContextValue | null } = { current: null };
   function Probe() {
     const ctx = useSlider({ options: { perPage: 1 } });
@@ -45,11 +45,28 @@ it('starts at index 0 with correct nav state', () => {
       ctx.setPageCount(3);
     }, [ctx.setPageCount]);
     captured.current = ctx;
-    return null;
+    return (
+      <div
+        ref={ctx.registerScrollElement}
+        style={{ display: 'flex', width: 200, overflowX: 'auto' }}
+      >
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            data-carousel-page="true"
+            style={{ flex: '0 0 200px', width: 200, height: 50 }}
+          >
+            {i}
+          </div>
+        ))}
+      </div>
+    );
   }
   render(<Probe />);
   expect(captured.current?.currentIndex).toBe(0);
   expect(captured.current?.canGoPrev).toBe(false);
+  // once setPageCount(3) flushes, the slider knows more pages exist → canGoNext flips true
+  await vi.waitFor(() => expect(captured.current?.canGoNext).toBe(true));
 });
 
 it('exposes an imperative api on mount and go() scrolls', async () => {
@@ -284,7 +301,7 @@ it('onDestroy is called when component unmounts', () => {
 
 it('grid mode: goTo uses perMove=1 and perStep=1 for pagination', () => {
   // Exercises lines 79 and 191: resolvedOptions.grid ? 1 : ... branches
-  // Use a self-contained component with explicit pageCount (no useEffect timing issue)
+  // GridProbe reports its page count via a useEffect (setPageCount(3) after mount)
   const api: { current: SliderApi | null } = { current: null };
   function GridProbe() {
     const ctx = useSlider({
