@@ -110,10 +110,11 @@ export function useSlider({
       }
       // clamped is bounded by the reachable page count, so the target always exists.
       const target = pageElements[clamped];
-      scrollElement.scrollTo({
-        behavior: 'smooth',
-        left: target.offsetLeft - scrollElement.offsetLeft,
-      });
+      const targetStart = target.offsetLeft - scrollElement.offsetLeft;
+      // The last reachable page scrolls flush to the end so trailing peeking
+      // slides are fully revealed instead of being cut off at the snap point.
+      const targetLeft = clamped >= maxIndex ? maxScrollLeft : Math.min(targetStart, maxScrollLeft);
+      scrollElement.scrollTo({ behavior: 'smooth', left: targetLeft });
       emitMoved(clamped);
     },
     [emitMoved, resolvedOptions]

@@ -5,7 +5,7 @@ import { Slider } from './components/Slider';
 import { SliderPagination } from './components/SliderPagination';
 import { SliderSlide } from './components/SliderSlide';
 import { SliderTrack } from './components/SliderTrack';
-import type { SliderContextValue } from './types';
+import type { SliderApi, SliderContextValue } from './types';
 import { useSlider } from './use-slider';
 
 // Regression tests for the fixed-width pagination bug: with slides narrower than
@@ -48,6 +48,41 @@ it('activates the last dot once scrolled to the end', async () => {
     expect(dots).toHaveLength(3);
     const active = dots.findIndex((d) => d.getAttribute('data-current') === 'true');
     expect(active).toBe(2);
+  });
+});
+
+it('navigating to the last reachable page scrolls flush to the end', async () => {
+  const api: { current: SliderApi | null } = { current: null };
+  const { container } = render(
+    <div style={{ width: '500px' }}>
+      <Slider
+        aria-label="flush"
+        options={{ fixedWidth: '200px', gap: 0 }}
+        onMounted={(a) => {
+          api.current = a;
+        }}
+      >
+        <SliderTrack>
+          {Array.from({ length: 5 }, (_, i) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: fixed test fixture with stable ordering
+            <SliderSlide key={`f-${i}`}>{i}</SliderSlide>
+          ))}
+        </SliderTrack>
+      </Slider>
+    </div>
+  );
+  const scroll = container.querySelector<HTMLElement>('[data-slider-scroll]');
+  if (!scroll) {
+    throw new Error('no scroll');
+  }
+  await vi.waitFor(() => expect(api.current).not.toBeNull());
+  // 5 x 200 = 1000 content, 500 viewport => maxScrollLeft 500.
+  // go past the end -> clamps to the last reachable page -> flush to maxScrollLeft,
+  // not to the last reachable slide's start (which would cut off trailing slides).
+  api.current?.go(99);
+  await vi.waitFor(() => {
+    const max = scroll.scrollWidth - scroll.clientWidth;
+    expect(scroll.scrollLeft).toBeGreaterThanOrEqual(max - 1);
   });
 });
 
