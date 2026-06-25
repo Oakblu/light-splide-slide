@@ -202,10 +202,11 @@ it('goTo: clamps to upper bound', () => {
   expect(api.current?.index).toBe(2);
 });
 
-it('goTo: no-op when target page element is missing (pageCount > DOM pages)', () => {
+it('goTo: a target beyond the reachable range clamps to the last reachable page', () => {
   const api: { current: SliderApi | null } = { current: null };
   function MismatchedProbe() {
-    // pageCount=5 but only 2 DOM pages — target at clamped index may be undefined
+    // pageCount state is inflated to 5, but only 2 pages exist and both are
+    // reachable in the 200px viewport — go(4) must clamp to the last (index 1).
     const [pageCount, setPageCount] = useState(5);
     const ctx = useSlider({
       options: { perPage: 1 },
@@ -230,10 +231,8 @@ it('goTo: no-op when target page element is missing (pageCount > DOM pages)', ()
     );
   }
   render(<MismatchedProbe />);
-  // goTo(4) → clamped to maxIndex=4, but pageElements[4] is undefined → no-op
   expect(() => api.current?.go(4)).not.toThrow();
-  // index stays at 0
-  expect(api.current?.index).toBe(0);
+  expect(api.current?.index).toBe(1);
 });
 
 it('IntersectionObserver fallback: uses scroll/resize when IO is undefined', async () => {

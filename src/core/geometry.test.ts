@@ -5,8 +5,29 @@ import {
   getMaxIndex,
   getNearestPageIndex,
   getPaginationCount,
+  getReachablePageCount,
   resolveNextIndex,
 } from './geometry';
+
+describe('getReachablePageCount', () => {
+  it('returns at least 1 for an empty list', () => {
+    expect(getReachablePageCount([], 0)).toBe(1);
+  });
+  it('counts pages whose offset (relative to the first) is within maxScrollLeft', () => {
+    // offsets 0,200,400,600,800; maxScrollLeft 500 => 0,200,400 reachable
+    expect(getReachablePageCount([0, 200, 400, 600, 800], 500)).toBe(3);
+  });
+  it('is padding-independent (relative to the first offset)', () => {
+    expect(getReachablePageCount([16, 216, 416, 616, 816], 500)).toBe(3);
+  });
+  it('counts all pages when every snap position is reachable', () => {
+    expect(getReachablePageCount([0, 100, 200], 1000)).toBe(3);
+  });
+  it('applies the tolerance at the boundary', () => {
+    expect(getReachablePageCount([0, 500], 499, 1)).toBe(2);
+    expect(getReachablePageCount([0, 500], 498, 1)).toBe(1);
+  });
+});
 
 describe('getGridDimensions', () => {
   it('returns null without dimensions', () => {
