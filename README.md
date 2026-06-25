@@ -260,7 +260,7 @@ Dot indicators. Renders `null` when `options.pagination` is `false` or unset.
 | Option | Type | Default | Description |
 |---|---|---|---|
 | `arrows` | `boolean` | `true` | Show/hide the default arrow buttons |
-| `drag` | `boolean` | `true` | Enable drag-to-scroll (native scroll behavior) |
+| `drag` | `boolean` | `true` | When `false`, sets `touch-action: pan-y` on the scroll element to disable horizontal touch/trackpad panning. Native mouse drag-to-scroll is not implemented. |
 | `pagination` | `boolean` | `false` | Show pagination dots |
 | `perPage` | `number` | `1` | Slides visible per page |
 | `perMove` | `number` | `1` | Slides to advance per arrow click |
@@ -271,7 +271,6 @@ Dot indicators. Renders `null` when `options.pagination` is `false` or unset.
 | `grid` | `SliderGrid` | — | Group slides into a CSS grid |
 | `mediaQuery` | `'max' \| 'min'` | `'min'` | Direction for breakpoint matching |
 | `breakpoints` | `Record<number, Partial<SliderOptions>>` | — | Responsive overrides keyed by viewport width |
-| `keyboard` | `boolean` | `false` | Enable arrow-key navigation |
 | `type` | `'slide'` | `'slide'` | Slider mode; only `'slide'` is supported |
 
 ### Responsive breakpoints example
@@ -286,6 +285,8 @@ options={{
   },
 }}
 ```
+
+> **Note:** Passing an inline `options` or `breakpoints` object literal (a new object identity every render) causes the responsive store to re-subscribe on each render. Hoist the object outside your component or wrap it in `useMemo` to keep a stable reference.
 
 ---
 
@@ -370,14 +371,10 @@ If you want a fully custom shell (no `<Slider>`) you can drive the hook directly
 
 ```tsx
 import { useSlider, SliderContext } from 'light-splide-slide';
-import { useState } from 'react';
 
 function CustomShell({ children }: { children: React.ReactNode }) {
-  const [pageCount, setPageCount] = useState(0);
   const ctx = useSlider({
     options: { perPage: 2, gap: '1rem' },
-    pageCount,
-    setPageCount,
   });
 
   return (
@@ -395,12 +392,10 @@ function CustomShell({ children }: { children: React.ReactNode }) {
 | Param | Type | Description |
 |---|---|---|
 | `options` | `SliderOptions` | Slider configuration |
-| `pageCount` | `number` | Number of pages (provided by `<SliderTrack>`) |
-| `setPageCount` | `(n: number) => void` | Setter for `pageCount` (from `useState`) |
 | `onMounted` | `(api: SliderApi) => void` | Optional imperative API callback |
 | `onDestroy` | `() => void` | Optional cleanup callback |
 
-`useSlider` returns a `SliderContextValue` which matches exactly what `SliderContext.Provider` expects.
+`useSlider` returns a `SliderContextValue` which matches exactly what `SliderContext.Provider` expects. The returned context exposes `setPageCount` so a track component (such as `<SliderTrack>`) can report its page count back to the slider — you do not need to manage this state yourself.
 
 ---
 

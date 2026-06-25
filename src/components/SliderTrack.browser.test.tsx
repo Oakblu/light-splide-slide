@@ -164,3 +164,21 @@ it('cssGridRows mode with keyless slides uses ci as fallback key', () => {
   const pages = container.querySelectorAll('[data-carousel-page="true"]');
   expect(pages).toHaveLength(2);
 });
+
+it('sets touch-action: pan-y on the scroll element when drag is disabled', () => {
+  const { container } = makeSlider({ drag: false }, 2);
+  const scroll = container.querySelector<HTMLElement>('[data-slider-scroll]');
+  if (!scroll) {
+    throw new Error('expected scroll element');
+  }
+  expect(scroll.style.touchAction).toBe('pan-y');
+});
+
+it('leaves touch-action unset when drag is enabled (default)', () => {
+  const { container } = makeSlider({ drag: true }, 2);
+  const scroll = container.querySelector<HTMLElement>('[data-slider-scroll]');
+  if (!scroll) {
+    throw new Error('expected scroll element');
+  }
+  expect(scroll.style.touchAction).toBe('');
+});

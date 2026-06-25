@@ -1,13 +1,12 @@
 import { render } from '@testing-library/react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { expect, it, vi } from 'vitest';
 import { SliderContext } from './slider-context';
 import type { SliderApi, SliderContextValue, SliderOptions } from './types';
 import { useSlider } from './use-slider';
 
 function Harness({ options, onApi }: { options: SliderOptions; onApi?: (api: SliderApi) => void }) {
-  const [pageCount, setPageCount] = useState(0);
-  const ctx = useSlider({ options, pageCount, setPageCount, onMounted: onApi });
+  const ctx = useSlider({ options, onMounted: onApi });
   return (
     <SliderContext.Provider value={ctx}>
       <div
@@ -24,7 +23,7 @@ function Harness({ options, onApi }: { options: SliderOptions; onApi?: (api: Sli
           </div>
         ))}
       </div>
-      <Counter setPageCount={setPageCount} />
+      <Counter setPageCount={ctx.setPageCount} />
     </SliderContext.Provider>
   );
 }
@@ -38,16 +37,36 @@ function Counter({ setPageCount }: { setPageCount: (n: number) => void }) {
   return null;
 }
 
-it('starts at index 0 with correct nav state', () => {
+it('starts at index 0 with correct nav state', async () => {
   const captured: { current: SliderContextValue | null } = { current: null };
   function Probe() {
-    const [pageCount, setPageCount] = useState(3);
-    captured.current = useSlider({ options: { perPage: 1 }, pageCount, setPageCount });
-    return null;
+    const ctx = useSlider({ options: { perPage: 1 } });
+    useEffect(() => {
+      ctx.setPageCount(3);
+    }, [ctx.setPageCount]);
+    captured.current = ctx;
+    return (
+      <div
+        ref={ctx.registerScrollElement}
+        style={{ display: 'flex', width: 200, overflowX: 'auto' }}
+      >
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            data-carousel-page="true"
+            style={{ flex: '0 0 200px', width: 200, height: 50 }}
+          >
+            {i}
+          </div>
+        ))}
+      </div>
+    );
   }
   render(<Probe />);
   expect(captured.current?.currentIndex).toBe(0);
   expect(captured.current?.canGoPrev).toBe(false);
+  // once setPageCount(3) flushes, the slider knows more pages exist → canGoNext flips true
+  await vi.waitFor(() => expect(captured.current?.canGoNext).toBe(true));
 });
 
 it('exposes an imperative api on mount and go() scrolls', async () => {
@@ -70,44 +89,27 @@ it('exposes an imperative api on mount and go() scrolls', async () => {
   expect(moved).toHaveBeenCalledWith(1);
   // waitFor still holds: React state flush confirms canGoPrev/canGoNext update too
   await vi.waitFor(() => expect(api.current?.index).toBe(1));
+  // off() unsubscribes: a subsequent move must not invoke the listener again
   off?.();
-});
-
-it('on() ignores unknown events and returns a noop unsubscribe', () => {
-  const captured: { current: SliderContextValue | null } = { current: null };
-  const api: { current: SliderApi | null } = { current: null };
-  function Probe() {
-    const [pageCount, setPageCount] = useState(3);
-    captured.current = useSlider({
-      options: {},
-      pageCount,
-      setPageCount,
-      onMounted: (a) => {
-        api.current = a;
-      },
-    });
-    return null;
-  }
-  render(<Probe />);
-  const off = api.current?.on('weird', () => {});
-  expect(typeof off).toBe('function');
-  expect(() => off?.()).not.toThrow();
-  expect(captured.current?.pageCount).toBe(3);
+  moved.mockClear();
+  api.current?.go('>');
+  expect(api.current?.index).toBe(2);
+  expect(moved).not.toHaveBeenCalled();
 });
 
 it('next() and prev() context methods call goTo with correct direction', async () => {
   // Exercises the `prev` and `next` wrapper functions at use-slider.ts lines 99-100
   const api: { current: SliderApi | null } = { current: null };
   function NavProbe() {
-    const [pageCount, setPageCount] = useState(3);
     const result = useSlider({
       options: { perPage: 1 },
-      pageCount,
-      setPageCount,
       onMounted: (a) => {
         api.current = a;
       },
     });
+    useEffect(() => {
+      result.setPageCount(3);
+    }, [result.setPageCount]);
     // Expose next/prev via a wrapper that fires them
     return (
       <div
@@ -147,9 +149,12 @@ it('next() and prev() context methods call goTo with correct direction', async (
 it('goTo: no-op when scrollElement is not registered', () => {
   const captured: { current: SliderContextValue | null } = { current: null };
   function Probe() {
-    const [pageCount, setPageCount] = useState(3);
     // do NOT register a scroll element
-    captured.current = useSlider({ options: { perPage: 1 }, pageCount, setPageCount });
+    const ctx = useSlider({ options: { perPage: 1 } });
+    useEffect(() => {
+      ctx.setPageCount(3);
+    }, [ctx.setPageCount]);
+    captured.current = ctx;
     return null;
   }
   render(<Probe />);
@@ -160,8 +165,11 @@ it('goTo: no-op when scrollElement is not registered', () => {
 it('goTo: no-op when there are no page elements', () => {
   const captured: { current: SliderContextValue | null } = { current: null };
   function Probe() {
-    const [pageCount, setPageCount] = useState(3);
-    captured.current = useSlider({ options: { perPage: 1 }, pageCount, setPageCount });
+    const ctx = useSlider({ options: { perPage: 1 } });
+    useEffect(() => {
+      ctx.setPageCount(3);
+    }, [ctx.setPageCount]);
+    captured.current = ctx;
     return (
       // scroll element has no [data-carousel-page="true"] children
       <div ref={captured.current?.registerScrollElement} />
@@ -207,15 +215,15 @@ it('goTo: a target beyond the reachable range clamps to the last reachable page'
   function MismatchedProbe() {
     // pageCount state is inflated to 5, but only 2 pages exist and both are
     // reachable in the 200px viewport — go(4) must clamp to the last (index 1).
-    const [pageCount, setPageCount] = useState(5);
     const ctx = useSlider({
       options: { perPage: 1 },
-      pageCount,
-      setPageCount,
       onMounted: (a) => {
         api.current = a;
       },
     });
+    useEffect(() => {
+      ctx.setPageCount(5);
+    }, [ctx.setPageCount]);
     return (
       <div
         ref={ctx.registerScrollElement}
@@ -238,8 +246,10 @@ it('goTo: a target beyond the reachable range clamps to the last reachable page'
 it('IntersectionObserver fallback: uses scroll/resize when IO is undefined', async () => {
   vi.stubGlobal('IntersectionObserver', undefined);
   function IO_Probe() {
-    const [pageCount, setPageCount] = useState(1);
-    const ctx = useSlider({ options: { perPage: 1 }, pageCount, setPageCount });
+    const ctx = useSlider({ options: { perPage: 1 } });
+    useEffect(() => {
+      ctx.setPageCount(1);
+    }, [ctx.setPageCount]);
     return (
       <div
         ref={ctx.registerScrollElement}
@@ -262,12 +272,13 @@ it('IntersectionObserver fallback: uses scroll/resize when IO is undefined', asy
 it('breakpoints: resolves options at given viewport width', () => {
   const captured: { current: SliderContextValue | null } = { current: null };
   function Probe() {
-    const [pageCount, setPageCount] = useState(3);
-    captured.current = useSlider({
+    const ctx = useSlider({
       options: { perPage: 1, breakpoints: { 600: { perPage: 2 } } },
-      pageCount,
-      setPageCount,
     });
+    useEffect(() => {
+      ctx.setPageCount(3);
+    }, [ctx.setPageCount]);
+    captured.current = ctx;
     return null;
   }
   render(<Probe />);
@@ -280,8 +291,7 @@ it('breakpoints: resolves options at given viewport width', () => {
 it('onDestroy is called when component unmounts', () => {
   const onDestroy = vi.fn();
   function Probe() {
-    const [pageCount, setPageCount] = useState(0);
-    useSlider({ options: {}, pageCount, setPageCount, onDestroy });
+    useSlider({ options: {}, onDestroy });
     return null;
   }
   const { unmount } = render(<Probe />);
@@ -291,18 +301,18 @@ it('onDestroy is called when component unmounts', () => {
 
 it('grid mode: goTo uses perMove=1 and perStep=1 for pagination', () => {
   // Exercises lines 79 and 191: resolvedOptions.grid ? 1 : ... branches
-  // Use a self-contained component with explicit pageCount (no useEffect timing issue)
+  // GridProbe reports its page count via a useEffect (setPageCount(3) after mount)
   const api: { current: SliderApi | null } = { current: null };
   function GridProbe() {
-    const [pageCount, setPageCount] = useState(3);
     const ctx = useSlider({
       options: { grid: { dimensions: [[2, 2]] } },
-      pageCount,
-      setPageCount,
       onMounted: (a) => {
         api.current = a;
       },
     });
+    useEffect(() => {
+      ctx.setPageCount(3);
+    }, [ctx.setPageCount]);
     return (
       <div
         ref={ctx.registerScrollElement}
@@ -332,8 +342,10 @@ it('IntersectionObserver callback fires: visibility updates when IO reports inte
   // In Chromium, after render, IO fires for the observed element and determines visibility.
   const ctx: { current: ReturnType<typeof useSlider> | null } = { current: null };
   function Probe() {
-    const [pageCount, setPageCount] = useState(1);
-    const result = useSlider({ options: { perPage: 1 }, pageCount, setPageCount });
+    const result = useSlider({ options: { perPage: 1 } });
+    useEffect(() => {
+      result.setPageCount(1);
+    }, [result.setPageCount]);
     ctx.current = result;
     return (
       <div
@@ -363,8 +375,10 @@ it('IntersectionObserver callback fires: visibility updates when IO reports inte
 it('IntersectionObserver: observer cleanup runs on unmount', () => {
   // Exercises the `() => { observer.disconnect(); }` cleanup function
   function Probe() {
-    const [pageCount, setPageCount] = useState(1);
-    const ctx = useSlider({ options: { perPage: 1 }, pageCount, setPageCount });
+    const ctx = useSlider({ options: { perPage: 1 } });
+    useEffect(() => {
+      ctx.setPageCount(1);
+    }, [ctx.setPageCount]);
     return (
       <div
         ref={ctx.registerScrollElement}
@@ -388,15 +402,15 @@ it('scroll-sync: scroll event on scroll container triggers emitMoved via RAF', a
   const scrollEl: { current: HTMLElement | null } = { current: null };
 
   function ScrollSyncProbe() {
-    const [pageCount, setPageCount] = useState(3);
     const ctx = useSlider({
       options: { perPage: 1 },
-      pageCount,
-      setPageCount,
       onMounted: (a) => {
         api.current = a;
       },
     });
+    useEffect(() => {
+      ctx.setPageCount(3);
+    }, [ctx.setPageCount]);
     return (
       <div
         ref={(el) => {

@@ -29,7 +29,6 @@ export type SliderOptions = {
   fixedWidth?: string | number;
   gap?: string | number;
   grid?: SliderGrid;
-  keyboard?: boolean;
   mediaQuery?: 'max' | 'min';
   padding?: SliderPadding | number | string;
   pagination?: boolean;
@@ -38,11 +37,15 @@ export type SliderOptions = {
   type?: 'slide';
 };
 
+export type SliderEventMap = {
+  moved: (index: number) => void;
+};
+
 export type SliderApi = {
   destroy: () => void;
   go: (control: SliderControl) => void;
   index: number;
-  on: (event: string, callback: (newIndex: number) => void) => () => void;
+  on: <E extends keyof SliderEventMap>(event: E, callback: SliderEventMap[E]) => () => void;
 };
 
 export type SliderContextValue = {
