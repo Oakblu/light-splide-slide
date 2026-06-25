@@ -1,0 +1,69 @@
+/* Optional baseline theme for light-splide-slide. Import only if you want it:
+   import 'light-splide-slide/styles.css';
+   Override any of these custom properties to retheme. */
+[data-slider-arrows] {
+  --slider-arrow-size: 2.75rem;
+  --slider-arrow-bg: #3a3a3c;
+  --slider-arrow-color: #ffffff;
+  --slider-arrow-radius: 0.5rem;
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+[data-slider-arrows] button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: var(--slider-arrow-size);
+  height: var(--slider-arrow-size);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: var(--slider-arrow-bg);
+  color: var(--slider-arrow-color);
+  opacity: 0.75;
+  pointer-events: auto;
+  cursor: pointer;
+}
+[data-slider-arrows] button:hover {
+  opacity: 1;
+}
+[data-slider-arrows] button[data-direction="prev"] {
+  left: 0;
+  border-radius: 0 var(--slider-arrow-radius) var(--slider-arrow-radius) 0;
+}
+[data-slider-arrows] button[data-direction="next"] {
+  right: 0;
+  border-radius: var(--slider-arrow-radius) 0 0 var(--slider-arrow-radius);
+}
+[data-slider-arrows] button[data-disabled="true"] {
+  opacity: 0;
+}
+[data-slider-arrows] button svg {
+  width: 1em;
+  height: 1em;
+}
+
+[data-slider-pagination] {
+  --slider-dot-size: 0.625rem;
+  --slider-dot-color: #c7c7cc;
+  --slider-dot-active-color: #0a84ff;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+[data-slider-dot] {
+  width: var(--slider-dot-size);
+  height: var(--slider-dot-size);
+  border-radius: 9999px;
+  background: var(--slider-dot-color);
+}
+[data-slider-dot][data-current="true"] {
+  background: var(--slider-dot-active-color);
+}

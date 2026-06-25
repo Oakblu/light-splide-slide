@@ -1,0 +1,4 @@
+# Pre-approve esbuild's build script (vite's native dependency) so `pnpm install`
+# works without an interactive `pnpm approve-builds` prompt.
+allowBuilds:
+  esbuild: true

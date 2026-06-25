@@ -549,7 +549,13 @@ export function resolveOptions(
 }
 ```
 
-Note on the scalar-padding test: `mergePadding('1rem', {left:'2rem'})` → `nb={left:'1rem',right:'1rem'}`, `no={left:'2rem',right:undefined}` → spread gives `{left:'2rem', right:undefined}`. **Adjust the test expectation** to `{ left: '2rem', right: undefined }` OR change `mergePadding` to drop `undefined` keys. Choose: change the test to expect `{ left: '2rem', right: undefined }` (KISS — matches legacy behavior). Update Step 1's "normalizes scalar padding" assertion accordingly before running.
+Note on the scalar-padding test (CORRECTED): for an OBJECT override, `no = override`
+itself (e.g. `{left:'2rem'}` — no `right` key), so `{...nb, ...no}` =
+`{left:'2rem', right:'1rem'}` — the unspecified `right` is preserved from base. The
+"normalizes scalar padding" test must therefore expect `{ left: '2rem', right: '1rem' }`,
+and a one-side object override over an object base must keep the other side (regression
+test added). An earlier draft of this note wrongly claimed `right: undefined`; that would
+drop a side on responsive padding overrides and is a bug. Keep the spread implementation.
 
 - [ ] **Step 4: Run to confirm pass** — `pnpm test -- options` → PASS.
 

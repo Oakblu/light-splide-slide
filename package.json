@@ -1,42 +1,72 @@
 {
   "name": "light-splide-slide",
   "version": "0.1.0",
-  "description": "Lightweight, dependency-free React carousel/slider with a Splide-like API (scroll-snap based, SSR-friendly).",
+  "description": "Headless, SSR-safe, dependency-light React slider/carousel built on native scroll-snap.",
   "license": "MIT",
   "type": "module",
-  "main": "./src/index.tsx",
-  "module": "./src/index.tsx",
-  "types": "./src/index.tsx",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./src/index.tsx",
-      "import": "./src/index.tsx",
-      "default": "./src/index.tsx"
-    }
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./styles.css": "./dist/styles.css"
   },
   "files": [
-    "src"
+    "dist"
   ],
-  "sideEffects": false,
+  "sideEffects": [
+    "*.css"
+  ],
   "keywords": [
     "react",
     "slider",
     "carousel",
-    "splide",
-    "scroll-snap"
+    "headless",
+    "scroll-snap",
+    "ssr"
   ],
   "peerDependencies": {
     "react": ">=18",
     "react-dom": ">=18"
   },
-  "dependencies": {
-    "tailwind-merge": "^3.6.0"
+  "scripts": {
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:cov": "vitest run --coverage",
+    "build": "tsup && cp src/styles.css dist/styles.css",
+    "check": "pnpm lint && pnpm typecheck && pnpm test:cov",
+    "prepublishOnly": "pnpm check && pnpm build",
+    "release:patch": "pnpm check && pnpm build && npm version patch && npm publish && git push --follow-tags",
+    "release:minor": "pnpm check && pnpm build && npm version minor && npm publish && git push --follow-tags",
+    "release:major": "pnpm check && pnpm build && npm version major && npm publish && git push --follow-tags"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.5.1",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/react": "^16.3.2",
     "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
+    "@vitest/browser": "^4.1.9",
+    "@vitest/browser-playwright": "^4.1.9",
+    "@vitest/coverage-v8": "^4.1.9",
+    "playwright": "^1.61.1",
     "react": "19.2.6",
     "react-dom": "19.2.6",
-    "typescript": "^6.0.3"
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   }
 }

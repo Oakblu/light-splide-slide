@@ -10,7 +10,9 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
+    "ignoreDeprecations": "6.0",
     "noEmit": true
   },
-  "include": ["src", "examples"]
+  "include": ["src", "examples", "*.config.ts"],
+  "exclude": ["examples/vite-demo"]
 }
