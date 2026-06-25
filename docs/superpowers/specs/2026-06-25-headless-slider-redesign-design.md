@@ -27,48 +27,56 @@ Also missing: a `CLAUDE.md`, and one-step version-bump + npm-publish commands.
 ## Goals & Non-Goals
 
 **Goals**
+
 - Truly **headless** core: works with Tailwind, CSS Modules, styled-components, vanilla
   CSS, or inline styles — equally well, with no preference baked in.
 - **Clean 1.0 API** (breaking redesign permitted): real typed props instead of magic
   strings; neutral, non-`Splide` naming.
 - **SSR-first**: identical server and first-client render; no hydration mismatch.
 - **TDD-first**, SOLID, DRY, KISS.
+- **Strict TypeScript**: no `any`, no `unknown`, no type assertions (`as` / `<T>x`, except
+  `as const`), no non-null assertions (`!`) — in source and tests. Cast-free patterns only.
 - **≥ 99% test coverage** (lines, statements, functions, branches), enforced in CI.
 - Tooling: **Biome** (lint/format), **tsup** (build), one-step release scripts, `CLAUDE.md`,
   rewritten comprehensive `README`.
 
 **Non-Goals**
+
 - Backward compatibility with the current `Splide*` exports (no aliases; clean break).
 - Supporting carousel `type` modes other than `slide`.
-- A heavy "batteries-included" theme. The shipped stylesheet is an *optional* minimal baseline.
+- A heavy "batteries-included" theme. The shipped stylesheet is an _optional_ minimal baseline.
 
 ## Decisions (locked during brainstorming)
 
-| Decision | Choice |
-| --- | --- |
-| Styling model | Headless core; structural styles only; `className`+`style` on every part; `data-*` state hooks; CSS custom properties for theming; optional baseline CSS at a subpath. Any styling system works. |
-| API compatibility | Clean breaking redesign → this is the 1.0 surface. No `Splide*` aliases. |
-| Test strategy | Hybrid: pure logic in Vitest **node**; DOM/geometry in Vitest **Browser Mode** (real Chromium via Playwright). |
-| Extensibility shape | **Hybrid (Option C)**: ergonomic compound components built *on top of* an exported `useSlider` controller hook + prop-getters. One source of truth. |
-| Lint/format | Biome. |
-| Build | tsup (ESM + CJS + d.ts). |
-| Release | npm-native one-step scripts (`release:patch/minor/major`). |
+| Decision            | Choice                                                                                                                                                                                           |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Styling model       | Headless core; structural styles only; `className`+`style` on every part; `data-*` state hooks; CSS custom properties for theming; optional baseline CSS at a subpath. Any styling system works. |
+| API compatibility   | Clean breaking redesign → this is the 1.0 surface. No `Splide*` aliases.                                                                                                                         |
+| Test strategy       | Hybrid: pure logic in Vitest **node**; DOM/geometry in Vitest **Browser Mode** (real Chromium via Playwright).                                                                                   |
+| Extensibility shape | **Hybrid (Option C)**: ergonomic compound components built _on top of_ an exported `useSlider` controller hook + prop-getters. One source of truth.                                              |
+| Lint/format         | Biome.                                                                                                                                                                                           |
+| Build               | tsup (ESM + CJS + d.ts).                                                                                                                                                                         |
+| Release             | npm-native one-step scripts (`release:patch/minor/major`).                                                                                                                                       |
 
 ## Architecture — three layers
 
 Dependency direction is strictly **presentation → controller → core**. Core depends on nothing.
 
 ### Layer 1 — Pure core (`src/core/`)
+
 No React, no DOM. Pure functions, trivially unit-testable in node toward ~100%:
+
 - `resolveOptions`, `mergeOptions` (+ `mergePadding`, `mergeGrid`)
 - `getMaxIndex`, `getPaginationCount`, `resolveNextIndex`, `getGridDimensions`,
   `getNearestPageIndex`, `toCssUnit`
 
 These are lifted out of the current `SplideWrapper/utils.ts`, with any DOM coupling removed.
-Single responsibility: decide *what* should happen, never *how* the DOM does it.
+Single responsibility: decide _what_ should happen, never _how_ the DOM does it.
 
 ### Layer 2 — Controller hook (`src/use-slider.ts`)
+
 The single stateful brain. Owns:
+
 - `currentIndex` (+ `currentIndexRef`), scroll-element ref, moved-listener set, imperative API.
 - Prop-getters: `getTrackProps`, `getSlideProps`, `getPrevButtonProps`, `getNextButtonProps`,
   `getPaginationProps`.
@@ -86,7 +94,9 @@ CSS custom properties set via media/container queries), so most responsive behav
 no JS viewport read at all.
 
 ### Layer 3 — Presentation (`src/components/`)
+
 Thin, side-effect-free-during-render components consuming the controller via context:
+
 - `Slider` — root; owns controller; provides context; requires `aria-label`.
 - `SliderTrack` — scrollable snap track.
 - `SliderSlide` — one slide; width from `fixedWidth` or `perPage` via CSS.
@@ -119,10 +129,12 @@ Types:
 ```
 
 **Magic strings → real props:**
+
 - `className.includes('noArrows')` → `<SliderArrows hideOnMobile />`.
 - `className.includes('splideNav--top')` → `<SliderArrows placement="top" />`.
 
 **Styling contract (no fixed colors):**
+
 - Structural inline styles only (flex, snap, overflow, computed slide width, gap/padding vars).
 - `data-*` state for any selector engine: `data-active`, `data-disabled` (arrows),
   `data-current` (pagination), `data-orientation`.
@@ -163,6 +175,7 @@ under threshold. Genuinely untestable lines use an explicit, commented `/* v8 ig
 (kept to near-zero, each justified).
 
 **Test categories:**
+
 - Core math/option resolution (node) — breakpoints, grid, perPage/perMove, padding merge,
   index clamping, nearest-page.
 - SSR (node) — server snapshot equals base options; no `window` access in snapshot path.
@@ -178,12 +191,14 @@ under threshold. Genuinely untestable lines use an explicit, commented `/* v8 ig
 **Biome** — `biome.json`; scripts `lint`, `lint:fix`, `format`; runs in CI and pre-publish.
 
 **tsup** — ESM + CJS + `.d.ts`. `exports`:
+
 - `"."` → types/import/require for the library.
 - `"./styles.css"` → optional baseline stylesheet.
 - `"sideEffects": ["*.css"]`; `files: ["dist"]`.
 - `react`/`react-dom` remain peer deps; **`tailwind-merge` removed**.
 
 **Release scripts (npm-native, KISS):**
+
 - `release:patch` / `release:minor` / `release:major` →
   `check` (lint + typecheck + test + coverage gate) → `build` → `npm version <type>` →
   `npm publish` → `git push --follow-tags`.
@@ -195,7 +210,7 @@ under threshold. Genuinely untestable lines use an explicit, commented `/* v8 ig
 99% coverage gate, node-vs-browser test split, headless/no-fixed-colors styling contract,
 and the release commands.
 
-**README** rewritten: headless quickstart; styling with *each* system (Tailwind, CSS
+**README** rewritten: headless quickstart; styling with _each_ system (Tailwind, CSS
 Modules, styled-components, vanilla CSS, inline); CSS-variable theming reference; full
 options/props/`data-*` tables; imperative API; `useSlider` custom-build recipe; SSR notes.
 
