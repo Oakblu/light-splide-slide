@@ -59,10 +59,13 @@ export function resolveOptions(
   if (!breakpoints || viewportWidth === null) {
     return base;
   }
+  const mediaQuery = base.mediaQuery ?? 'max';
+  // min: ascending so the largest matching breakpoint wins (mobile-first cascade).
+  // max: descending so the smallest matching breakpoint wins (desktop-first cascade,
+  //      mirrors CSS where a tighter max-width overrides a wider one).
   const entries = Object.entries(breakpoints)
     .map(([w, v]) => [Number(w), v] as const)
-    .sort(([a], [b]) => a - b);
-  const mediaQuery = base.mediaQuery ?? 'max';
+    .sort(([a], [b]) => (mediaQuery === 'max' ? b - a : a - b));
   return entries.reduce<SliderOptions>((resolved, [width, opts]) => {
     const apply = mediaQuery === 'min' ? viewportWidth >= width : viewportWidth <= width;
     return apply ? mergeOptions(resolved, opts) : resolved;

@@ -1,10 +1,11 @@
 'use client';
-import { type ReactNode, useEffect, useRef } from 'react';
+import { Children, type ReactNode, cloneElement, isValidElement, useEffect, useRef } from 'react';
 import { computeScrollStyle } from '../core';
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect';
 import { SliderContext } from '../slider-context';
-import type { SliderApi, SliderOptions } from '../types';
+import type { SliderApi, SliderInjectedOptions, SliderOptions } from '../types';
 import { useSlider } from '../use-slider';
+import { SliderTrack } from './SliderTrack';
 
 type SliderRuntimeProps = {
   options: SliderOptions;
@@ -61,10 +62,20 @@ export function SliderRuntime({ options, onMounted, onDestroy, children }: Slide
     }
   }, [resolvedOptions]);
 
+  // Re-inject resolvedOptions into SliderTrack on every render so slides get the
+  // correct perPage/gap/etc. when a breakpoint fires after the initial server render.
+  // Slider injected base options (null viewport); this overrides them with the live ones.
+  const injectedChildren = Children.map(children, (child) => {
+    if (isValidElement<SliderInjectedOptions>(child) && child.type === SliderTrack) {
+      return cloneElement(child, { __sliderOptions: resolvedOptions });
+    }
+    return child;
+  });
+
   return (
     <SliderContext.Provider value={ctx}>
       <div ref={rootRef} data-slider-runtime="" style={{ display: 'contents' }}>
-        {children}
+        {injectedChildren}
       </div>
     </SliderContext.Provider>
   );

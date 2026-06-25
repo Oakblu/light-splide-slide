@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react';
-import { expect, it } from 'vitest';
+import { expect, it, vi } from 'vitest';
 import { Slider } from './Slider';
 import { SliderSlide } from './SliderSlide';
 import { SliderTrack } from './SliderTrack';
@@ -54,6 +54,34 @@ it('section has position: relative', () => {
   const section = container.querySelector<HTMLElement>('section');
   if (!section) throw new Error('section not found');
   expect(section.style.position).toBe('relative');
+});
+
+it('breakpoint overrides slide width: SliderRuntime must re-inject responsive options', async () => {
+  // max-width: 99999px always matches → breakpoint perPage=2 overrides base perPage=4.
+  // If Slider only injects base options (null viewport), slides stay at 25% (perPage=4).
+  // After the fix, SliderRuntime re-injects resolvedOptions and slides are 50% (perPage=2).
+  const { container } = render(
+    <div style={{ width: '400px' }}>
+      <Slider
+        aria-label="bp"
+        options={{ perPage: 4, gap: 0, breakpoints: { 99999: { perPage: 2 } } }}
+      >
+        <SliderTrack>
+          <SliderSlide>a</SliderSlide>
+          <SliderSlide>b</SliderSlide>
+          <SliderSlide>c</SliderSlide>
+          <SliderSlide>d</SliderSlide>
+        </SliderTrack>
+      </Slider>
+    </div>
+  );
+  const slide = container.querySelector<HTMLElement>('[data-carousel-page]');
+  if (!slide) throw new Error('no slide');
+  // perPage=2 → each slide fills 50% of the 400px container → ≈200px
+  // perPage=4 (bug: base injected, never updated) → 25% → ≈100px
+  await vi.waitFor(() => {
+    expect(slide.getBoundingClientRect().width).toBeGreaterThan(150);
+  });
 });
 
 it('user style merges into section alongside position: relative', () => {

@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactNode } from "react";
 import {
   Slider,
   SliderArrows,
@@ -6,10 +6,10 @@ import {
   SliderSlide,
   SliderTrack,
   useSliderContext,
-} from 'light-splide-slide';
+} from "light-splide-slide";
 // Optional baseline theme — drives the first demo. Remove this import and the
 // arrows/dots render unstyled (headless), ready for your own CSS.
-import 'light-splide-slide/styles.css';
+import "light-splide-slide/styles.css";
 
 type Item = { id: number; label: string; hue: number };
 
@@ -22,7 +22,10 @@ const items: Item[] = Array.from({ length: 10 }, (_, i) => ({
 function Card({ item }: { item: Item }) {
   return (
     <div className="card" style={{ background: `hsl(${item.hue} 70% 92%)` }}>
-      <span className="card__index" style={{ color: `hsl(${item.hue} 60% 35%)` }}>
+      <span
+        className="card__index"
+        style={{ color: `hsl(${item.hue} 60% 35%)` }}
+      >
         {item.id}
       </span>
       <span className="card__label">{item.label}</span>
@@ -85,9 +88,9 @@ export default function App() {
         <Slider
           aria-label="Baseline slider"
           options={{
-            fixedWidth: '14rem',
-            gap: '1rem',
-            padding: { left: '1rem', right: '1rem' },
+            fixedWidth: "14rem",
+            gap: "1rem",
+            padding: { left: "1rem", right: "1rem" },
             pagination: true,
           }}
         >
@@ -111,8 +114,8 @@ export default function App() {
           aria-label="Responsive slider"
           options={{
             perPage: 3,
-            gap: '1rem',
-            mediaQuery: 'max',
+            gap: "1rem",
+            mediaQuery: "max",
             breakpoints: { 640: { perPage: 1 } },
           }}
         >
@@ -137,7 +140,13 @@ export default function App() {
       >
         <Slider
           aria-label="Grid slider"
-          options={{ grid: { dimensions: [[2, 3]], gap: { row: '0.75rem', col: '0.75rem' } }, pagination: true }}
+          options={{
+            grid: {
+              dimensions: [[2, 3]],
+              gap: { row: "0.75rem", col: "0.75rem" },
+            },
+            pagination: true,
+          }}
         >
           <SliderArrows />
           <SliderTrack>
@@ -155,7 +164,10 @@ export default function App() {
         title="4. Fully custom controls (headless)"
         description="Built-in arrows disabled; navigation rendered from useSliderContext()."
       >
-        <Slider aria-label="Custom-controls slider" options={{ perPage: 2, gap: '1rem', arrows: false }}>
+        <Slider
+          aria-label="Custom-controls slider"
+          options={{ perPage: 2, gap: "1rem", arrows: false }}
+        >
           <CustomNav />
           <SliderTrack>
             {items.map((item) => (

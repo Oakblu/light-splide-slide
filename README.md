@@ -272,19 +272,37 @@ Dot indicators. Renders `null` when `options.pagination` is `false` or unset.
 | `gap` | `string \| number` | `0` | Gap between slides (e.g. `'1rem'`, `16`) |
 | `padding` | `{ left?: string \| number; right?: string \| number } \| string \| number` | — | Scroll container padding (for peeking edges) |
 | `grid` | `SliderGrid` | — | Group slides into a CSS grid |
-| `mediaQuery` | `'max' \| 'min'` | `'min'` | Direction for breakpoint matching |
+| `mediaQuery` | `'max' \| 'min'` | `'max'` | Direction for breakpoint matching — `'max'` for desktop-first, `'min'` for mobile-first |
 | `breakpoints` | `Record<number, Partial<SliderOptions>>` | — | Responsive overrides keyed by viewport width |
 | `type` | `'slide'` | `'slide'` | Slider mode; only `'slide'` is supported |
 
-### Responsive breakpoints example
+### Responsive breakpoints
+
+Breakpoints work like CSS media queries. The default `mediaQuery: 'max'` is **desktop-first**: the base `options` apply to the widest screens, and each breakpoint narrows toward mobile. The smallest matching breakpoint wins, mirroring `@media (max-width: …)` cascade order.
 
 ```tsx
+// Desktop-first (default — no mediaQuery needed)
+options={{
+  perPage: 3,
+  perMove: 3,
+  gap: '1rem',
+  breakpoints: {
+    950: { perPage: 2, perMove: 2 }, // viewport ≤ 950px
+    640: { perPage: 1, perMove: 1 }, // viewport ≤ 640px
+  },
+}}
+```
+
+`mediaQuery: 'min'` is **mobile-first**: the base options apply to the narrowest screens, and each breakpoint expands toward desktop (mirrors `@media (min-width: …)`).
+
+```tsx
+// Mobile-first
 options={{
   perPage: 1,
   mediaQuery: 'min',
   breakpoints: {
-    640: { perPage: 2 },
-    1024: { perPage: 3, gap: '1.5rem' },
+    640: { perPage: 2 },            // viewport ≥ 640px
+    1024: { perPage: 3, gap: '1.5rem' }, // viewport ≥ 1024px
   },
 }}
 ```
@@ -404,7 +422,7 @@ function CustomShell({ children }: { children: React.ReactNode }) {
 
 ## SSR notes
 
-- **No `window`/`document` during render.** `useSlider` resolves viewport width via `useSyncExternalStore` with a `getServerSnapshot` that returns `null`. While the width is `null` — on the server and during the first client paint before hydration — no breakpoint overrides are applied, so the slider renders with your base `options`. After hydration it reads the real `window.innerWidth` and re-resolves any `breakpoints`. This keeps server and first-client markup identical (no hydration mismatch).
+- **No `window`/`document` during render.** `useSlider` resolves viewport width via `useSyncExternalStore` with a `getServerSnapshot` that returns `null`. While the width is `null` — on the server and during the first client paint before hydration — no breakpoint overrides are applied, so the slider renders with your base `options`. After hydration the real `window.innerWidth` is read, breakpoints are resolved, and both the scroll container styles and individual slide widths update to match the active breakpoint. This keeps server and first-client markup identical (no hydration mismatch).
 - **React Server Component support.** `Slider`, `SliderTrack`, and `SliderSlide` are React Server Components — they render structural markup from options with no client-side JavaScript and are safe to import directly from Next.js App Router server components. `'use client'` is present only on the interactive parts: the internal `SliderRuntime` island (the controller/context provider that `Slider` renders automatically), `SliderArrows`, `SliderPagination`, the `useSlider` hook, `SliderContext`, and the internal measurement hooks. Slide content passed as `children` continues to render on the server as normal.
 
   The headless `useSlider`/`SliderContext` path requires a client boundary because it uses hooks directly — wrap your custom shell in `'use client'` as usual.

@@ -116,9 +116,13 @@ export function useSlider({ options, onMounted, onDestroy }: UseSliderParams): S
   const perStep = resolvePerStep(resolvedOptions);
   const maxIndex =
     reachableCount !== null ? reachableCount - 1 : getMaxIndex(resolvedOptions, pageCount);
+  // For perStep=1 (fixedWidth/peeking), use reachableCount directly — trailing
+  // positions that share the same scroll end must not each get a dot.
+  // For perStep>1 (perMove>1), reachableCount counts individual slides, not
+  // page groups, so getPaginationCount(pageCount) gives the correct grouping.
   const paginationCount =
-    reachableCount !== null
-      ? Math.max(Math.ceil(reachableCount / perStep), 1)
+    reachableCount !== null && perStep <= 1
+      ? Math.max(reachableCount, 1)
       : getPaginationCount(resolvedOptions, pageCount);
   const currentPageIndex =
     currentIndex >= maxIndex

@@ -35,14 +35,15 @@ describe('resolveOptions', () => {
     );
     expect(r.perPage).toBe(2);
   });
-  it('sorts multiple breakpoints and applies all that match', () => {
-    // two breakpoints; both apply at viewport 400 in max mode
+  it('max mode: smallest matching breakpoint wins (most specific for narrow viewport)', () => {
+    // Viewport 400 is below both 500 and 800; the tighter (500) constraint should win.
+    // CSS max-width semantics: @media(max-width:500px) overrides @media(max-width:800px)
+    // when both match, because the smaller breakpoint is more specific.
     const r = resolveOptions(
       { perPage: 1, breakpoints: { 800: { perPage: 2 }, 500: { perPage: 3 } } },
       400
     );
-    // sorted ascending: 500 applied first (perPage→3), then 800 applied (perPage→2)
-    expect(r.perPage).toBe(2);
+    expect(r.perPage).toBe(3);
   });
   it('does not apply min-width breakpoint below width', () => {
     const r = resolveOptions(

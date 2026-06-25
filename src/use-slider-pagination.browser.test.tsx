@@ -26,6 +26,28 @@ function renderFixed(containerWidth: number, slideWidth: string, count: number) 
   );
 }
 
+it('renders ceil(slideCount/perMove) dots when perPage=perMove > 1', async () => {
+  // 8 slides, perPage=3, perMove=3 → 3 pages: [0-2], [3-5], [6-7]
+  // reachableCount=6 (slides 0-5 fit in scroll), but pagination should reflect
+  // logical pages (ceil(8/3)=3), not ceil(reachable/perMove)=2.
+  const { container } = render(
+    <div style={{ width: '300px' }}>
+      <Slider aria-label="perpage" options={{ perPage: 3, perMove: 3, gap: 0, pagination: true }}>
+        <SliderTrack>
+          {Array.from({ length: 8 }, (_, i) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: fixed test fixture with stable ordering
+            <SliderSlide key={`s-${i}`}>{i}</SliderSlide>
+          ))}
+        </SliderTrack>
+        <SliderPagination />
+      </Slider>
+    </div>
+  );
+  await vi.waitFor(() => {
+    expect(container.querySelectorAll('[data-slider-dot]')).toHaveLength(3);
+  });
+});
+
 it('renders one dot per REACHABLE snap position, not per slide', async () => {
   // 5 slides x 200px = 1000 scrollWidth; 500 viewport => maxScrollLeft 500.
   // Offsets 0,200,400,600,800 — reachable (<=500): 0,200,400 => 3 positions.
