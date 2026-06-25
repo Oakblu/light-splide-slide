@@ -271,7 +271,6 @@ Dot indicators. Renders `null` when `options.pagination` is `false` or unset.
 | `grid` | `SliderGrid` | — | Group slides into a CSS grid |
 | `mediaQuery` | `'max' \| 'min'` | `'min'` | Direction for breakpoint matching |
 | `breakpoints` | `Record<number, Partial<SliderOptions>>` | — | Responsive overrides keyed by viewport width |
-| `keyboard` | `boolean` | `false` | Enable arrow-key navigation |
 | `type` | `'slide'` | `'slide'` | Slider mode; only `'slide'` is supported |
 
 ### Responsive breakpoints example
@@ -370,14 +369,10 @@ If you want a fully custom shell (no `<Slider>`) you can drive the hook directly
 
 ```tsx
 import { useSlider, SliderContext } from 'light-splide-slide';
-import { useState } from 'react';
 
 function CustomShell({ children }: { children: React.ReactNode }) {
-  const [pageCount, setPageCount] = useState(0);
   const ctx = useSlider({
     options: { perPage: 2, gap: '1rem' },
-    pageCount,
-    setPageCount,
   });
 
   return (
@@ -395,12 +390,10 @@ function CustomShell({ children }: { children: React.ReactNode }) {
 | Param | Type | Description |
 |---|---|---|
 | `options` | `SliderOptions` | Slider configuration |
-| `pageCount` | `number` | Number of pages (provided by `<SliderTrack>`) |
-| `setPageCount` | `(n: number) => void` | Setter for `pageCount` (from `useState`) |
 | `onMounted` | `(api: SliderApi) => void` | Optional imperative API callback |
 | `onDestroy` | `() => void` | Optional cleanup callback |
 
-`useSlider` returns a `SliderContextValue` which matches exactly what `SliderContext.Provider` expects.
+`useSlider` returns a `SliderContextValue` which matches exactly what `SliderContext.Provider` expects. The returned context exposes `setPageCount` so a track component (such as `<SliderTrack>`) can report its page count back to the slider — you do not need to manage this state yourself.
 
 ---
 

@@ -1,5 +1,4 @@
 import { render } from '@testing-library/react';
-import { useState } from 'react';
 import { expect, it, vi } from 'vitest';
 import { Slider } from './components/Slider';
 import { SliderPagination } from './components/SliderPagination';
@@ -89,8 +88,7 @@ it('navigating to the last reachable page scrolls flush to the end', async () =>
 it('a scroll that stays on the same page does not change the index', async () => {
   const captured: { ctx: SliderContextValue | null } = { ctx: null };
   function Probe() {
-    const [pageCount, setPageCount] = useState(0);
-    const ctx = useSlider({ options: { fixedWidth: '200px', gap: 0 }, pageCount, setPageCount });
+    const ctx = useSlider({ options: { fixedWidth: '200px', gap: 0 } });
     captured.ctx = ctx;
     return (
       <div style={{ width: '500px' }}>
@@ -123,8 +121,7 @@ it('a scroll that stays on the same page does not change the index', async () =>
 it('a scroll with no pages present is a no-op (does not throw)', async () => {
   const captured: { ctx: SliderContextValue | null } = { ctx: null };
   function Probe() {
-    const [pageCount, setPageCount] = useState(0);
-    const ctx = useSlider({ options: {}, pageCount, setPageCount });
+    const ctx = useSlider({ options: {} });
     captured.ctx = ctx;
     return (
       <div

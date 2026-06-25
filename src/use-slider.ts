@@ -17,19 +17,12 @@ import type { SliderApi, SliderContextValue, SliderControl, SliderOptions } from
 
 type UseSliderParams = {
   options: SliderOptions;
-  pageCount: number;
-  setPageCount: (n: number) => void;
   onMounted?: (api: SliderApi) => void;
   onDestroy?: () => void;
 };
 
-export function useSlider({
-  options,
-  pageCount,
-  setPageCount,
-  onMounted,
-  onDestroy,
-}: UseSliderParams): SliderContextValue {
+export function useSlider({ options, onMounted, onDestroy }: UseSliderParams): SliderContextValue {
+  const [pageCount, setPageCount] = useState(0);
   const breakpointWidths = useMemo(
     () => Object.keys(options.breakpoints ?? {}).map(Number),
     [options.breakpoints]

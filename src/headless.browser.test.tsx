@@ -1,5 +1,4 @@
 import { render } from '@testing-library/react';
-import { useState } from 'react';
 import { expect, it } from 'vitest';
 import { SliderTrack } from './components/SliderTrack';
 import { SliderContext, useSliderContext } from './slider-context';
@@ -8,8 +7,7 @@ import { useSlider } from './use-slider';
 
 it('builds a custom slider purely from useSlider', () => {
   function Custom() {
-    const [pageCount, setPageCount] = useState(0);
-    const ctx = useSlider({ options: { perPage: 1 }, pageCount, setPageCount });
+    const ctx = useSlider({ options: { perPage: 1 } });
     return (
       <SliderContext.Provider value={ctx}>
         <button type="button" aria-label="custom-next" onClick={ctx.next}>
