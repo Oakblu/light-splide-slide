@@ -45,6 +45,7 @@
     "size": "size-limit",
     "check": "pnpm lint && pnpm typecheck && pnpm test:cov",
     "prepublishOnly": "pnpm check && pnpm build",
+    "prepare:publish": "pnpm lint:fix && pnpm format && pnpm test && pnpm build && pnpm check",
     "release:patch": "pnpm check && pnpm build && npm version patch && npm publish && git push --follow-tags",
     "release:minor": "pnpm check && pnpm build && npm version minor && npm publish && git push --follow-tags",
     "release:major": "pnpm check && pnpm build && npm version major && npm publish && git push --follow-tags"

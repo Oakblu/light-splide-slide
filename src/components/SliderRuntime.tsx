@@ -1,5 +1,5 @@
 'use client';
-import { Children, type ReactNode, cloneElement, isValidElement, useEffect, useRef } from 'react';
+import { Children, cloneElement, isValidElement, type ReactNode, useEffect, useRef } from 'react';
 import { computeScrollStyle } from '../core';
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect';
 import { SliderContext } from '../slider-context';
