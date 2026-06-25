@@ -120,7 +120,10 @@ export function SliderTrack({
         key={`page-${pageKey}`}
         className={gridClassName}
         data-carousel-page="true"
-        style={{ minWidth: 0, flexShrink: 0, scrollSnapAlign: 'start' }}
+        // A grid page is one snap unit: it must fill the viewport so the inner
+        // grid's fractional columns have a width to divide (otherwise they
+        // collapse to min-content and every page packs side-by-side).
+        style={{ width: '100%', flex: '0 0 100%', minWidth: 0, scrollSnapAlign: 'start' }}
       >
         <div style={innerStyle}>
           {page.map((child, ci) => {
