@@ -1,0 +1,42 @@
+{
+  "name": "light-splide-slide",
+  "version": "0.1.0",
+  "description": "Lightweight, dependency-free React carousel/slider with a Splide-like API (scroll-snap based, SSR-friendly).",
+  "license": "MIT",
+  "type": "module",
+  "main": "./src/index.tsx",
+  "module": "./src/index.tsx",
+  "types": "./src/index.tsx",
+  "exports": {
+    ".": {
+      "types": "./src/index.tsx",
+      "import": "./src/index.tsx",
+      "default": "./src/index.tsx"
+    }
+  },
+  "files": [
+    "src"
+  ],
+  "sideEffects": false,
+  "keywords": [
+    "react",
+    "slider",
+    "carousel",
+    "splide",
+    "scroll-snap"
+  ],
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "dependencies": {
+    "tailwind-merge": "^3.6.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.15",
+    "@types/react-dom": "^19.2.3",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "typescript": "^6.0.3"
+  }
+}
