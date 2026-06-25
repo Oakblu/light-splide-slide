@@ -34,7 +34,7 @@ export type SliderOptions = {
   pagination?: boolean;
   perMove?: number;
   perPage?: number;
-  type?: 'slide';
+  type?: 'slide' | 'loop';
 };
 
 export type SliderEventMap = {
