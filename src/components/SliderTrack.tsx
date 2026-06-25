@@ -11,7 +11,7 @@ import {
   useEffect,
   useMemo,
 } from 'react';
-import { getGridDimensions, toCssUnit } from '../core';
+import { computeScrollStyle, getGridDimensions, toCssUnit } from '../core';
 import { useSliderContext } from '../slider-context';
 
 type SliderTrackProps = HTMLAttributes<HTMLDivElement> & {
@@ -70,36 +70,11 @@ export function SliderTrack({
     return null;
   }
 
-  const gap = toCssUnit(carousel.options.gap) ?? '0px';
-  const hasPadding = carousel.options.padding !== undefined;
-  const pad =
-    typeof carousel.options.padding === 'object'
-      ? carousel.options.padding
-      : { left: carousel.options.padding, right: carousel.options.padding };
-  const paddingLeft = toCssUnit(pad?.left) ?? '0px';
-  const paddingRight = toCssUnit(pad?.right) ?? '0px';
-
+  const { style: scrollBaseStyle, cssVars: scrollCssVars } = computeScrollStyle(carousel.options);
+  const gap = toCssUnit(carousel.options.gap) ?? '0px'; // still needed for grid row/col fallbacks below
   const scrollStyle: CSSProperties & Record<`--${string}`, string> = {
-    display: 'flex',
-    scrollSnapType: 'x mandatory',
-    overflowX: 'auto',
-    overflowY: 'hidden',
-    overscrollBehaviorX: 'contain',
-    scrollbarWidth: 'none',
-    scrollBehavior: 'smooth',
-    gap,
-    '--slider-gap': gap,
-    '--slider-padding-left': paddingLeft,
-    '--slider-padding-right': paddingRight,
-    ...(hasPadding
-      ? {
-          paddingLeft,
-          paddingRight,
-          scrollPaddingLeft: paddingLeft,
-          scrollPaddingRight: paddingRight,
-        }
-      : {}),
-    ...(carousel.options.drag === false ? { touchAction: 'pan-y' } : {}),
+    ...scrollBaseStyle,
+    ...scrollCssVars,
   };
 
   const renderGroupedPage = (page: ReactElement[], pageIndex: number) => {
