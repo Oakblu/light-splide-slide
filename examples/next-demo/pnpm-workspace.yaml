@@ -1,0 +1,5 @@
+# Marks this demo as its own pnpm project root (isolated from the library install).
+# Pre-approve native build scripts so `pnpm install` runs without an interactive
+# `pnpm approve-builds` prompt.
+allowBuilds:
+  sharp: true

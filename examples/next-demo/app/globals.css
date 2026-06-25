@@ -1,0 +1,150 @@
+:root {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: #1d1d1f;
+  background: #f5f5f7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.page {
+  max-width: 56rem;
+  margin: 0 auto;
+  padding: 2rem 1rem 4rem;
+}
+
+.page__header h1 {
+  margin: 0;
+  font-size: 1.75rem;
+}
+
+.page__header p {
+  margin: 0.25rem 0 0;
+  color: #6e6e73;
+}
+
+.router-switch {
+  display: inline-flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.router-switch a {
+  color: #06c;
+  text-decoration: none;
+}
+
+.router-switch a:hover {
+  text-decoration: underline;
+}
+
+.demo {
+  margin-top: 2.5rem;
+  background: #fff;
+  border: 1px solid #e5e5ea;
+  border-radius: 0.75rem;
+  padding: 1.5rem 1.25rem 2rem;
+}
+
+.demo h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.demo p {
+  margin: 0.25rem 0 1.25rem;
+  color: #6e6e73;
+  font-size: 0.9rem;
+}
+
+/* Demo cards */
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  height: 9rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgb(0 0 0 / 6%);
+}
+
+.card__index {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.card__label {
+  font-size: 0.85rem;
+  color: #48484a;
+}
+
+/* Demo 2: arrows styled purely through className (no baseline CSS) */
+.myarrows__btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2.5rem;
+  height: 2.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid #d2d2d7;
+  border-radius: 9999px;
+  background: #fff;
+  color: #1d1d1f;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 12%);
+}
+
+.myarrows__btn svg {
+  width: 0.9em;
+  height: 0.9em;
+}
+
+.myarrows__btn--prev {
+  left: -0.5rem;
+}
+
+.myarrows__btn--next {
+  right: -0.5rem;
+}
+
+.myarrows__btn[data-disabled="true"] {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* Demo 4: custom headless nav */
+.custom-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.custom-nav button {
+  padding: 0.4rem 0.9rem;
+  border: 1px solid #d2d2d7;
+  border-radius: 0.5rem;
+  background: #fff;
+  cursor: pointer;
+}
+
+.custom-nav button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.custom-nav__count {
+  font-variant-numeric: tabular-nums;
+  color: #6e6e73;
+  font-size: 0.9rem;
+}
