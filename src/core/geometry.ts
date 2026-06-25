@@ -58,6 +58,29 @@ export function resolveNextIndex({
   return Number(control);
 }
 
+// How many snap positions can actually be scrolled to. A page is reachable when
+// its offset (relative to the first page) is within the container's max scroll.
+// With slides narrower than the viewport (fixedWidth / peeking), the trailing
+// pages share the end position, so the reachable count is fewer than the page
+// count — this is what pagination and bounds must be based on, not perPage.
+export function getReachablePageCount(
+  pageOffsets: readonly number[],
+  maxScrollLeft: number,
+  tolerancePx = 1
+) {
+  if (!pageOffsets.length) {
+    return 1;
+  }
+  const first = pageOffsets[0];
+  let count = 0;
+  for (const offset of pageOffsets) {
+    if (offset - first <= maxScrollLeft + tolerancePx) {
+      count++;
+    }
+  }
+  return Math.max(count, 1);
+}
+
 export function getNearestPageIndex(
   pageElements: readonly Pick<HTMLElement, 'offsetLeft'>[],
   scrollLeft: number
