@@ -405,16 +405,9 @@ function CustomShell({ children }: { children: React.ReactNode }) {
 ## SSR notes
 
 - **No `window`/`document` during render.** `useSlider` resolves viewport width via `useSyncExternalStore` with a `getServerSnapshot` that returns `null`. While the width is `null` — on the server and during the first client paint before hydration — no breakpoint overrides are applied, so the slider renders with your base `options`. After hydration it reads the real `window.innerWidth` and re-resolves any `breakpoints`. This keeps server and first-client markup identical (no hydration mismatch).
-- **`use client` directive.** All components and the hook are marked `'use client'` because they use React state and effects. In a Next.js app, wrap the slider in a client component boundary:
+- **React Server Component support.** `Slider`, `SliderTrack`, and `SliderSlide` are React Server Components — they render structural markup from options with no client-side JavaScript and are safe to import directly from Next.js App Router server components. `'use client'` is present only on the interactive parts: the internal `SliderRuntime` island (the controller/context provider that `Slider` renders automatically), `SliderArrows`, `SliderPagination`, the `useSlider` hook, `SliderContext`, and the internal measurement hooks. Slide content passed as `children` continues to render on the server as normal.
 
-```tsx
-// app/page.tsx  (Server Component)
-import { MySlider } from './MySlider'; // MySlider.tsx is 'use client'
-
-export default function Page() {
-  return <MySlider />;
-}
-```
+  The headless `useSlider`/`SliderContext` path requires a client boundary because it uses hooks directly — wrap your custom shell in `'use client'` as usual.
 
 ---
 

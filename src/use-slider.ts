@@ -93,8 +93,11 @@ export function useSlider({ options, onMounted, onDestroy }: UseSliderParams): S
       if (clamped === currentIndexRef.current) {
         return;
       }
+      // `clamped` is bounded by maxIndex (the last reachable page), so pages[clamped] always exists.
       const target = pages[clamped];
       const targetStart = target.offsetLeft - scrollElement.offsetLeft;
+      // When navigating to the last reachable page, scroll flush to the end so any trailing
+      // peeking slides are fully revealed rather than cut off at their snap point.
       const targetLeft = clamped >= maxIndex ? maxScrollLeft : Math.min(targetStart, maxScrollLeft);
       scrollElement.scrollTo({ behavior: 'smooth', left: targetLeft });
       emitMoved(clamped);
