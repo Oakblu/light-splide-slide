@@ -2,13 +2,15 @@
 import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
 import { toCssUnit } from '../core';
 import { useSliderContext } from '../slider-context';
+import type { SliderInjectedOptions } from '../types';
 
 export function SliderSlide({
   className,
   style,
   children,
+  __sliderOptions: _ignoredSliderOptions,
   ...rest
-}: HTMLAttributes<HTMLDivElement> & { children?: ReactNode }) {
+}: HTMLAttributes<HTMLDivElement> & SliderInjectedOptions & { children?: ReactNode }) {
   const carousel = useSliderContext();
   if (!carousel) {
     return (

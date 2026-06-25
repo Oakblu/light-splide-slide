@@ -122,12 +122,21 @@ export function SliderTrack({
   };
 
   const renderFlatPage = (page: ReactElement, pageIndex: number) => {
-    const pageProps: Attributes & { 'data-carousel-page': true } = {
+    const base: Attributes & { 'data-carousel-page': true } = {
       // v8 ignore next -- Children.toArray always assigns keys; `?? \`page-${pageIndex}\`` is unreachable
       key: page.key ?? `page-${pageIndex}`,
       'data-carousel-page': true,
     };
-    return cloneElement(page, pageProps);
+    // Inject resolved options only into component slides (e.g. <SliderSlide>); never onto
+    // host elements like <div>, where an unknown prop would reach the DOM.
+    if (typeof page.type === 'string') {
+      return cloneElement(page, base);
+    }
+    const injected: typeof base & SliderInjectedOptions = {
+      ...base,
+      __sliderOptions: carousel.options,
+    };
+    return cloneElement(page, injected);
   };
 
   return (
