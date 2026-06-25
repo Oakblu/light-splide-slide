@@ -2,8 +2,8 @@
 import {
   type Attributes,
   Children,
-  cloneElement,
   type CSSProperties,
+  cloneElement,
   isValidElement,
   type ReactElement,
   type ReactNode,
@@ -90,7 +90,12 @@ export function SliderTrack({
     '--slider-padding-left': paddingLeft,
     '--slider-padding-right': paddingRight,
     ...(hasPadding
-      ? { paddingLeft, paddingRight, scrollPaddingLeft: paddingLeft, scrollPaddingRight: paddingRight }
+      ? {
+          paddingLeft,
+          paddingRight,
+          scrollPaddingLeft: paddingLeft,
+          scrollPaddingRight: paddingRight,
+        }
       : {}),
   };
 

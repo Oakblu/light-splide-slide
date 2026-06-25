@@ -47,8 +47,8 @@ export function SliderArrows({
   }
   const handlePrev = onPrev ?? carousel?.prev ?? noop;
   const handleNext = onNext ?? carousel?.next ?? noop;
-  const canPrev = onPrev ? true : carousel?.canGoPrev ?? false;
-  const canNext = onNext ? true : carousel?.canGoNext ?? false;
+  const canPrev = onPrev ? true : (carousel?.canGoPrev ?? false);
+  const canNext = onNext ? true : (carousel?.canGoNext ?? false);
 
   return (
     <div

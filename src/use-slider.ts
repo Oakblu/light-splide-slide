@@ -1,12 +1,5 @@
 'use client';
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  useSyncExternalStore,
-} from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import {
   getMaxIndex,
   getNearestPageIndex,
@@ -82,7 +75,7 @@ export function useSlider({
         return;
       }
       const maxIndex = getMaxIndex(resolvedOptions, pageCount);
-      const perMove = resolvedOptions.grid ? 1 : resolvedOptions.perMove ?? 1;
+      const perMove = resolvedOptions.grid ? 1 : (resolvedOptions.perMove ?? 1);
       const next = resolveNextIndex({ control, currentIndex: currentIndexRef.current, perMove });
       const clamped = Math.max(0, Math.min(next, maxIndex));
       if (clamped === currentIndexRef.current) {
@@ -92,7 +85,10 @@ export function useSlider({
       if (!target) {
         return;
       }
-      scrollElement.scrollTo({ behavior: 'smooth', left: target.offsetLeft - scrollElement.offsetLeft });
+      scrollElement.scrollTo({
+        behavior: 'smooth',
+        left: target.offsetLeft - scrollElement.offsetLeft,
+      });
       emitMoved(clamped);
     },
     [emitMoved, pageCount, resolvedOptions]
@@ -126,9 +122,10 @@ export function useSlider({
       cancelAnimationFrame(frame);
       scrollElement.removeEventListener('scroll', handle);
     };
-  }, [emitMoved, pageCount]);
+  }, [emitMoved]);
 
   // last-child visibility
+  // biome-ignore lint/correctness/useExhaustiveDependencies: pageCount is a re-run trigger — the last child element changes when the page count changes, so the effect must re-run to (re)observe it.
   useEffect(() => {
     const scrollElement = scrollElementRef.current;
     const lastChild = scrollElement?.lastElementChild;
@@ -190,9 +187,11 @@ export function useSlider({
 
   const maxIndex = getMaxIndex(resolvedOptions, pageCount);
   const paginationCount = getPaginationCount(resolvedOptions, pageCount);
-  const perStep = resolvedOptions.grid ? 1 : resolvedOptions.perMove ?? 1;
+  const perStep = resolvedOptions.grid ? 1 : (resolvedOptions.perMove ?? 1);
   const currentPageIndex =
-    currentIndex >= maxIndex ? Math.max(paginationCount - 1, 0) : Math.floor(currentIndex / perStep);
+    currentIndex >= maxIndex
+      ? Math.max(paginationCount - 1, 0)
+      : Math.floor(currentIndex / perStep);
 
   return {
     canGoNext: currentIndex < maxIndex && !isLastChildVisible,

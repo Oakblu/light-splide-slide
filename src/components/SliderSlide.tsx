@@ -23,7 +23,13 @@ export function SliderSlide({
   const width = fixedWidth
     ? fixedWidth
     : `calc((100% - (${gap} * ${Math.max(perPage - 1, 0)})) / ${perPage})`;
-  const slideStyle: CSSProperties = { minWidth: 0, flexShrink: 0, scrollSnapAlign: 'start', width, ...style };
+  const slideStyle: CSSProperties = {
+    minWidth: 0,
+    flexShrink: 0,
+    scrollSnapAlign: 'start',
+    width,
+    ...style,
+  };
   return (
     <div className={className} style={slideStyle} {...rest}>
       {children}

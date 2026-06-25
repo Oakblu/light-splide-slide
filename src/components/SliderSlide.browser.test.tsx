@@ -25,7 +25,9 @@ it('forwards className and style', () => {
   const { container } = render(
     <Slider aria-label="d">
       <SliderTrack>
-        <SliderSlide className="slide" style={{ color: 'rgb(0, 128, 0)' }}>a</SliderSlide>
+        <SliderSlide className="slide" style={{ color: 'rgb(0, 128, 0)' }}>
+          a
+        </SliderSlide>
       </SliderTrack>
     </Slider>
   );

@@ -14,7 +14,14 @@ describe('getGridDimensions', () => {
     expect(getGridDimensions({ dimensions: [] })).toBeNull();
   });
   it('sums columns and items per page, takes max rows', () => {
-    expect(getGridDimensions({ dimensions: [[2, 2], [1, 3]] })).toEqual({
+    expect(
+      getGridDimensions({
+        dimensions: [
+          [2, 2],
+          [1, 3],
+        ],
+      })
+    ).toEqual({
       columns: 5,
       itemsPerPage: 7,
       rows: 2,
@@ -74,7 +81,11 @@ describe('getNearestPageIndex', () => {
     expect(getNearestPageIndex([], 0)).toBeNull();
   });
   it('picks the element whose offsetLeft is closest', () => {
-    const els: { offsetLeft: number }[] = [{ offsetLeft: 0 }, { offsetLeft: 100 }, { offsetLeft: 200 }];
+    const els: { offsetLeft: number }[] = [
+      { offsetLeft: 0 },
+      { offsetLeft: 100 },
+      { offsetLeft: 200 },
+    ];
     expect(getNearestPageIndex(els, 90)).toBe(1);
     expect(getNearestPageIndex(els, 10)).toBe(0);
   });

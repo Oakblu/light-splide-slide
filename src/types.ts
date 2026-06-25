@@ -1,12 +1,25 @@
 import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
 
-export enum NavigationAction { Next = 'next', Prev = 'prev' }
+export enum NavigationAction {
+  Next = 'next',
+  Prev = 'prev',
+}
 
-export type SliderControl = number | `${number}` | `+${number}` | `-${number}` | '>' | '<' | NavigationAction;
+export type SliderControl =
+  | number
+  | `${number}`
+  | `+${number}`
+  | `-${number}`
+  | '>'
+  | '<'
+  | NavigationAction;
 
 export type SliderPadding = { left?: string | number; right?: string | number };
 
-export type SliderGrid = { gap?: { row?: string | number; col?: string | number }; dimensions?: [number, number][] };
+export type SliderGrid = {
+  gap?: { row?: string | number; col?: string | number };
+  dimensions?: [number, number][];
+};
 
 export type SliderOptions = {
   arrows?: boolean;

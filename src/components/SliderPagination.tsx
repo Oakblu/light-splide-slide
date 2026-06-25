@@ -18,7 +18,7 @@ export function SliderPagination({
   renderDot,
 }: SliderPaginationProps) {
   const carousel = useSliderContext();
-  if (!carousel || !carousel.options.pagination) {
+  if (!carousel?.options.pagination) {
     return null;
   }
   return (

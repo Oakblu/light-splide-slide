@@ -4,7 +4,14 @@ import { mergeOptions, resolveOptions } from './options';
 describe('resolveOptions', () => {
   it('applies defaults', () => {
     const r = resolveOptions({}, null);
-    expect(r).toMatchObject({ arrows: true, drag: true, pagination: false, perMove: 1, perPage: 1, type: 'slide' });
+    expect(r).toMatchObject({
+      arrows: true,
+      drag: true,
+      pagination: false,
+      perMove: 1,
+      perPage: 1,
+      type: 'slide',
+    });
   });
   it('user options override defaults', () => {
     expect(resolveOptions({ perPage: 3 }, null).perPage).toBe(3);
@@ -22,7 +29,10 @@ describe('resolveOptions', () => {
     expect(r.perPage).toBe(1);
   });
   it('applies min-width breakpoints', () => {
-    const r = resolveOptions({ perPage: 1, mediaQuery: 'min', breakpoints: { 600: { perPage: 2 } } }, 800);
+    const r = resolveOptions(
+      { perPage: 1, mediaQuery: 'min', breakpoints: { 600: { perPage: 2 } } },
+      800
+    );
     expect(r.perPage).toBe(2);
   });
 });
@@ -32,7 +42,10 @@ describe('mergeOptions', () => {
     expect(mergeOptions({ perPage: 1 }).perPage).toBe(1);
   });
   it('deep-merges padding objects', () => {
-    const r = mergeOptions({ padding: { left: '1rem', right: '1rem' } }, { padding: { right: '2rem' } });
+    const r = mergeOptions(
+      { padding: { left: '1rem', right: '1rem' } },
+      { padding: { right: '2rem' } }
+    );
     expect(r.padding).toEqual({ left: '1rem', right: '2rem' });
   });
   it('normalizes scalar base padding and preserves unspecified override side', () => {
@@ -40,7 +53,10 @@ describe('mergeOptions', () => {
     expect(r.padding).toEqual({ left: '2rem', right: '1rem' });
   });
   it('object override of only one side keeps the other side from base', () => {
-    const r = mergeOptions({ padding: { left: '1rem', right: '1rem' } }, { padding: { left: '2rem' } });
+    const r = mergeOptions(
+      { padding: { left: '1rem', right: '1rem' } },
+      { padding: { left: '2rem' } }
+    );
     expect(r.padding).toEqual({ left: '2rem', right: '1rem' });
   });
   it('deep-merges grid gap', () => {

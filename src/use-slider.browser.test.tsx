@@ -49,7 +49,14 @@ it('starts at index 0 with correct nav state', () => {
 
 it('exposes an imperative api on mount and go() scrolls', async () => {
   const api: { current: SliderApi | null } = { current: null };
-  render(<Harness options={{ perPage: 1 }} onApi={(a) => { api.current = a; }} />);
+  render(
+    <Harness
+      options={{ perPage: 1 }}
+      onApi={(a) => {
+        api.current = a;
+      }}
+    />
+  );
   expect(api.current).not.toBeNull();
   expect(api.current?.index).toBe(0);
   const moved = vi.fn();
@@ -68,7 +75,14 @@ it('on() ignores unknown events and returns a noop unsubscribe', () => {
   const api: { current: SliderApi | null } = { current: null };
   function Probe() {
     const [pageCount, setPageCount] = useState(3);
-    captured.current = useSlider({ options: {}, pageCount, setPageCount, onMounted: (a) => { api.current = a; } });
+    captured.current = useSlider({
+      options: {},
+      pageCount,
+      setPageCount,
+      onMounted: (a) => {
+        api.current = a;
+      },
+    });
     return null;
   }
   render(<Probe />);

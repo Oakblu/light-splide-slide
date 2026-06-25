@@ -26,7 +26,9 @@ describe('createResponsiveStore', () => {
     const cb = vi.fn();
     store.subscribe(cb);
     fakeWindow.innerWidth = 400;
-    listeners.forEach((l) => l());
+    for (const l of listeners) {
+      l();
+    }
     expect(cb).toHaveBeenCalled();
     vi.unstubAllGlobals();
   });

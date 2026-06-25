@@ -1,4 +1,9 @@
-import { NavigationAction, type SliderControl, type SliderGrid, type SliderOptions } from '../types';
+import {
+  NavigationAction,
+  type SliderControl,
+  type SliderGrid,
+  type SliderOptions,
+} from '../types';
 
 export function getGridDimensions(grid?: SliderGrid) {
   const dimensions = grid?.dimensions;
