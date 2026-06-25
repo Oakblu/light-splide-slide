@@ -2,7 +2,7 @@
 
 **Date:** 2026-06-25
 **Status:** Approved (design) — pending spec review
-**Type:** Refactor + small features. Single spec, four phases.
+**Type:** Refactor + small features. Single spec, four phases + a deferred `drag` step.
 
 ## Goal
 
@@ -122,18 +122,11 @@ resolution only changes at thresholds — any width within a band resolves ident
 3. **Remove dead `keyboard` option.** Delete `keyboard?: boolean` from `SliderOptions`
    (read nowhere). **Break:** TS callers setting `keyboard` fail to compile.
 
-4. **Make `drag` real (wire `touch-action`).** `drag` is currently a no-op. Implement:
-   the scroll element in `SliderTrack` sets `touchAction: 'pan-y'` when
-   `options.drag === false` (disables horizontal touch/trackpad panning), and the
-   browser default (horizontal pan allowed) when `drag !== false`. Scope is limited to
-   touch/trackpad panning via `touch-action`; **native mouse drag-to-scroll is
-   explicitly out of scope** (would require pointer-event handlers and a JS drag loop,
-   against the package's no-JS-animation ethos — future spec if ever wanted).
-   `drag` stays in `SliderOptions` and `DEFAULTS` (default `true`). Browser test:
-   `drag: false` → `touch-action: pan-y` on the scroll element; default → not pan-y.
+The `drag` option is **deferred to Phase E** (after the size budget) and is NOT touched
+in this phase; it remains a no-op until then.
 
-**Docs:** README/examples updated for the new `useSlider` signature and the now-real
-`drag` semantics; `keyboard` references removed.
+**Docs:** README/examples updated for the new `useSlider` signature; `keyboard`
+references removed.
 
 ---
 
@@ -155,9 +148,28 @@ size` passes locally and the limit is set sanely above measured size.
 
 ---
 
+## Phase E — Make `drag` real (wire `touch-action`) — deferred, do last
+
+**Why last:** explicitly deferred per project owner; everything above ships first.
+
+`drag` is currently a no-op. Implement: the scroll element in `SliderTrack` sets
+`touchAction: 'pan-y'` when `options.drag === false` (disables horizontal touch/trackpad
+panning), and the browser default (horizontal pan allowed) when `drag !== false`. Scope
+is limited to touch/trackpad panning via `touch-action`; **native mouse drag-to-scroll
+is explicitly out of scope** (would require pointer-event handlers and a JS drag loop,
+against the package's no-JS-animation ethos — future spec if ever wanted). `drag` stays
+in `SliderOptions` and `DEFAULTS` (default `true`).
+
+**Tests:** browser test — `drag: false` → `touch-action: pan-y` on the scroll element;
+default → not pan-y. **Docs:** README/examples note the now-real `drag` semantics.
+
+Re-running Phase D's size gate after E is wise (new branch is tiny but non-zero).
+
+---
+
 ## Sequencing & integration
 
-B → A → C → D. Each phase is independently shippable and committed separately; coverage
+B → A → C → D → E. Each phase is independently shippable and committed separately; coverage
 gate and `pnpm check` stay green at every commit. The existing
 `use-slider.browser.test.tsx` serves as the behavioral oracle for the Phase B refactor
 and must remain green through A and C as well (except where C intentionally changes the
@@ -174,7 +186,8 @@ and must remain green through A and C as well (except where C intentionally chan
 
 - Resize within a breakpoint band triggers **zero** slider re-renders (asserted in test).
 - `use-slider.ts` ≤ ~100 lines; geometry read exists in exactly one place.
-- `keyboard` gone; `drag: false` measurably sets `touch-action: pan-y`; `on()` is typed.
-- `useSlider` callable without passing `pageCount`/`setPageCount`.
+- `keyboard` gone; `on()` is typed; `useSlider` callable without passing
+  `pageCount`/`setPageCount`.
 - `pnpm size` gate green and wired into `check`/CI.
+- (Phase E) `drag: false` measurably sets `touch-action: pan-y`.
 - Coverage ≥99%, `pnpm check` green, no `any`/`as`/`!` introduced.
