@@ -286,6 +286,8 @@ options={{
 }}
 ```
 
+> **Note:** Passing an inline `options` or `breakpoints` object literal (a new object identity every render) causes the responsive store to re-subscribe on each render. Hoist the object outside your component or wrap it in `useMemo` to keep a stable reference.
+
 ---
 
 ## `data-*` attribute reference
