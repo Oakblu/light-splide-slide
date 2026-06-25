@@ -40,8 +40,7 @@ export function useSlider({
     store.getServerSnapshot
   );
   const resolvedOptions = useMemo(
-    // v8 ignore next -- `options ?? {}` is a defensive fallback; TypeScript types guarantee options is defined
-    () => resolveOptions(options ?? {}, viewportWidth),
+    () => resolveOptions(options, viewportWidth),
     [options, viewportWidth]
   );
 
