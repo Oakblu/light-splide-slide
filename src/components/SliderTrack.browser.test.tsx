@@ -182,3 +182,23 @@ it('leaves touch-action unset when drag is enabled (default)', () => {
   }
   expect(scroll.style.touchAction).toBe('');
 });
+
+it('forwards data-testid (and other rest props) to the track wrapper', () => {
+  const { container } = render(
+    <Slider aria-label="test" options={{ perPage: 1 }}>
+      <SliderTrack data-testid="my-track">
+        <SliderSlide>a</SliderSlide>
+        <SliderSlide>b</SliderSlide>
+        <SliderSlide>c</SliderSlide>
+      </SliderTrack>
+    </Slider>
+  );
+  const el = container.querySelector('[data-testid="my-track"]');
+  // lands on the outer wrapper — the element that contains the scroll region
+  expect(el?.querySelector('[data-slider-scroll]')).toBeTruthy();
+});
+
+it('emits no data-testid by default (opt-in)', () => {
+  const { container } = makeSlider({ perPage: 1 }, 3);
+  expect(container.querySelector('[data-testid]')).toBeNull();
+});

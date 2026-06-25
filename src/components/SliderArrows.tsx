@@ -1,11 +1,11 @@
 'use client';
-import type { CSSProperties, ReactNode } from 'react';
+import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
 import { IconArrow } from '../icons/IconArrow';
 import { useSliderContext } from '../slider-context';
 
 type RenderButton = (p: { disabled: boolean; onClick: () => void }) => ReactNode;
 
-type SliderArrowsProps = {
+type SliderArrowsProps = HTMLAttributes<HTMLDivElement> & {
   className?: string;
   style?: CSSProperties;
   prevClassName?: string;
@@ -40,6 +40,7 @@ export function SliderArrows({
   onNext,
   renderPrev,
   renderNext,
+  ...rest
 }: SliderArrowsProps) {
   const carousel = useSliderContext();
   const arrowsEnabled = carousel?.options.arrows ?? true;
@@ -53,6 +54,7 @@ export function SliderArrows({
 
   return (
     <div
+      {...rest}
       className={className}
       style={style}
       data-slider-arrows=""

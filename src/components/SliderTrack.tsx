@@ -4,6 +4,7 @@ import {
   Children,
   type CSSProperties,
   cloneElement,
+  type HTMLAttributes,
   isValidElement,
   type ReactElement,
   type ReactNode,
@@ -13,7 +14,7 @@ import {
 import { getGridDimensions, toCssUnit } from '../core';
 import { useSliderContext } from '../slider-context';
 
-type SliderTrackProps = {
+type SliderTrackProps = HTMLAttributes<HTMLDivElement> & {
   className?: string;
   style?: CSSProperties;
   scrollClassName?: string;
@@ -33,6 +34,7 @@ export function SliderTrack({
   gridClassName,
   cssGridRows,
   children,
+  ...rest
 }: SliderTrackProps) {
   const carousel = useSliderContext();
   const gridDimensions = useMemo(
@@ -151,7 +153,7 @@ export function SliderTrack({
   };
 
   return (
-    <div className={className} style={{ overflow: 'hidden', ...style }}>
+    <div {...rest} className={className} style={{ overflow: 'hidden', ...style }}>
       <div
         ref={carousel.registerScrollElement}
         className={scrollClassName}

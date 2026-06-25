@@ -209,6 +209,7 @@ Scroll container. Renders `data-slider-scroll` (the actual scroll element) insid
 | `gridClassName` | `string` | Class on each grouped page element (grid mode) |
 | `cssGridRows` | `number` | Group slides into CSS grid columns of this many rows |
 | `children` | `ReactNode` | `<SliderSlide>` elements |
+| `...rest` | `HTMLAttributes<HTMLDivElement>` | Forwarded to the outer overflow wrapper (e.g. pass your own `data-testid`) |
 
 ### `<SliderSlide>`
 
@@ -240,6 +241,7 @@ Prev/next navigation. Renders `null` when `options.arrows` is `false` and no `on
 | `onNext` | `() => void` | — | Override next handler (bypasses slider state) |
 | `renderPrev` | `(p: { disabled: boolean; onClick: () => void }) => ReactNode` | — | Render prop for a fully custom prev button |
 | `renderNext` | `(p: { disabled: boolean; onClick: () => void }) => ReactNode` | — | Render prop for a fully custom next button |
+| `...rest` | `HTMLAttributes<HTMLDivElement>` | — | Forwarded to the wrapper `<div>` (e.g. pass your own `data-testid`); cannot override the component's own `data-*` attributes |
 
 ### `<SliderPagination>`
 
@@ -252,6 +254,7 @@ Dot indicators. Renders `null` when `options.pagination` is `false` or unset.
 | `dotClassName` | `string` | Class on each dot `<span>` |
 | `dotStyle` | `CSSProperties` | Style on each dot `<span>` |
 | `renderDot` | `(p: { index: number; current: boolean }) => ReactNode` | Render prop for a fully custom dot |
+| `...rest` | `HTMLAttributes<HTMLDivElement>` | Forwarded to the pagination wrapper `<div>` (e.g. pass your own `data-testid`) |
 
 ---
 

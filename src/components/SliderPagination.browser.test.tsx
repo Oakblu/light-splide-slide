@@ -34,6 +34,32 @@ it('renders nothing when pagination disabled', () => {
   expect(container.querySelectorAll('[data-slider-dot]')).toHaveLength(0);
 });
 
+it('forwards data-testid (and other rest props) to the pagination container', () => {
+  const { container } = render(
+    <Slider aria-label="d" options={{ perPage: 1, pagination: true }}>
+      <SliderTrack>
+        <SliderSlide>a</SliderSlide>
+      </SliderTrack>
+      <SliderPagination data-testid="my-pagination" />
+    </Slider>
+  );
+  const el = container.querySelector('[data-testid="my-pagination"]');
+  // lands on the pagination container — the element carrying the contract attribute
+  expect(el?.hasAttribute('data-slider-pagination')).toBe(true);
+});
+
+it('emits no data-testid by default (opt-in)', () => {
+  const { container } = render(
+    <Slider aria-label="d" options={{ perPage: 1, pagination: true }}>
+      <SliderTrack>
+        <SliderSlide>a</SliderSlide>
+      </SliderTrack>
+      <SliderPagination />
+    </Slider>
+  );
+  expect(container.querySelector('[data-testid]')).toBeNull();
+});
+
 it('renderDot render prop is called for each dot', () => {
   const { container } = render(
     <Slider aria-label="d" options={{ perPage: 1, pagination: true }}>

@@ -115,6 +115,24 @@ it('arrows disabled but custom handlers present — buttons still render', () =>
   expect(container.querySelectorAll('button')).toHaveLength(2);
 });
 
+it('forwards data-testid (and other rest props) to the arrows container', () => {
+  const { container } = setup({ 'data-testid': 'my-arrows' });
+  const el = container.querySelector('[data-testid="my-arrows"]');
+  // lands on the arrows container — the element carrying the contract attribute
+  expect(el?.hasAttribute('data-slider-arrows')).toBe(true);
+});
+
+it('emits no data-testid by default (opt-in)', () => {
+  const { container } = setup();
+  expect(container.querySelector('[data-testid]')).toBeNull();
+});
+
+it('rest props do not override the component’s own contract attributes', () => {
+  const { container } = setup({ 'data-slider-arrows': 'hacked', 'data-testid': 'arrows' });
+  const el = container.querySelector('[data-testid="arrows"]');
+  expect(el?.getAttribute('data-slider-arrows')).toBe('');
+});
+
 it('renders with noop handlers when rendered outside a Slider context', () => {
   // carousel is null → arrowsEnabled defaults to true, handlers fall back to noop
   const { container } = render(<SliderArrows />);

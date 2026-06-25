@@ -1,8 +1,8 @@
 'use client';
-import type { CSSProperties, ReactNode } from 'react';
+import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
 import { useSliderContext } from '../slider-context';
 
-type SliderPaginationProps = {
+type SliderPaginationProps = HTMLAttributes<HTMLDivElement> & {
   className?: string;
   style?: CSSProperties;
   dotClassName?: string;
@@ -16,13 +16,14 @@ export function SliderPagination({
   dotClassName,
   dotStyle,
   renderDot,
+  ...rest
 }: SliderPaginationProps) {
   const carousel = useSliderContext();
   if (!carousel?.options.pagination) {
     return null;
   }
   return (
-    <div className={className} style={style} data-slider-pagination="">
+    <div {...rest} className={className} style={style} data-slider-pagination="">
       {Array.from({ length: carousel.paginationCount }).map((_, index) => {
         const current = index === carousel.currentPageIndex;
         const key = `dot-${index}`;
