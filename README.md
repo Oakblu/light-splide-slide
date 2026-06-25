@@ -406,7 +406,7 @@ function CustomShell({ children }: { children: React.ReactNode }) {
 
 ## SSR notes
 
-- **No `window`/`document` during render.** `useSlider` resolves viewport width via `useSyncExternalStore` with a `getServerSnapshot` that returns `0`, so breakpoints start at their narrowest breakpoint on the server and hydrate on the client.
+- **No `window`/`document` during render.** `useSlider` resolves viewport width via `useSyncExternalStore` with a `getServerSnapshot` that returns `null`. While the width is `null` — on the server and during the first client paint before hydration — no breakpoint overrides are applied, so the slider renders with your base `options`. After hydration it reads the real `window.innerWidth` and re-resolves any `breakpoints`. This keeps server and first-client markup identical (no hydration mismatch).
 - **`use client` directive.** All components and the hook are marked `'use client'` because they use React state and effects. In a Next.js app, wrap the slider in a client component boundary:
 
 ```tsx

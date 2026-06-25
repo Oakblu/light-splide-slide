@@ -1,4 +1,4 @@
-import { fireEvent, render } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { expect, it, vi } from 'vitest';
 import { Slider } from './Slider';
 import { SliderArrows } from './SliderArrows';
@@ -76,7 +76,7 @@ it('custom onPrev handler makes prev always enabled and calls handler on click',
   const prevBtn = container.querySelector<HTMLButtonElement>('[data-direction="prev"]');
   // when onPrev is provided, canPrev is forced true
   expect(prevBtn?.disabled).toBe(false);
-  fireEvent.click(prevBtn as HTMLButtonElement);
+  prevBtn?.click();
   expect(onPrev).toHaveBeenCalledTimes(1);
 });
 
@@ -86,7 +86,7 @@ it('custom onNext handler makes next always enabled and calls handler on click',
   const nextBtn = container.querySelector<HTMLButtonElement>('[data-direction="next"]');
   // when onNext is provided, canNext is forced true
   expect(nextBtn?.disabled).toBe(false);
-  fireEvent.click(nextBtn as HTMLButtonElement);
+  nextBtn?.click();
   expect(onNext).toHaveBeenCalledTimes(1);
 });
 
@@ -118,9 +118,9 @@ it('arrows disabled but custom handlers present — buttons still render', () =>
 it('renders with noop handlers when rendered outside a Slider context', () => {
   // carousel is null → arrowsEnabled defaults to true, handlers fall back to noop
   const { container } = render(<SliderArrows />);
-  const buttons = container.querySelectorAll('button');
+  const buttons = container.querySelectorAll<HTMLButtonElement>('button');
   expect(buttons).toHaveLength(2);
-  // clicking the prev button calls noop (no throw)
-  expect(() => fireEvent.click(buttons[0])).not.toThrow();
-  expect(() => fireEvent.click(buttons[1])).not.toThrow();
+  // clicking the (disabled) buttons must not throw
+  expect(() => buttons[0].click()).not.toThrow();
+  expect(() => buttons[1].click()).not.toThrow();
 });
