@@ -22,6 +22,7 @@ export function SliderRuntime({ options, onMounted, onDestroy, children }: Slide
   // the count correct when children change.
   useEffect(() => {
     const root = rootRef.current;
+    // v8 ignore next 3 -- ref is always set before effects run; guard is defensive for the unmount edge case
     if (!root) {
       return;
     }

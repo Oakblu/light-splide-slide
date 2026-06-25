@@ -36,7 +36,6 @@ export function SliderTrack({
   gridClassName,
   cssGridRows,
   children,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   __sliderOptions: _ignoredSliderOptions,
   ...rest
 }: SliderTrackProps) {
