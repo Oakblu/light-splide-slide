@@ -449,3 +449,128 @@ it('scroll-sync: scroll event on scroll container triggers emitMoved via RAF', a
     { timeout: 2000 }
   );
 });
+
+// ── loop mode ─────────────────────────────────────────────────────────────────
+
+it('loop: go(">") at last index wraps to 0', () => {
+  const api: { current: SliderApi | null } = { current: null };
+  render(
+    <Harness
+      options={{ perPage: 1, type: 'loop' }}
+      onApi={(a) => {
+        api.current = a;
+      }}
+    />
+  );
+  // Harness has 3 slides each 200px wide, container 200px → maxIndex = 2
+  api.current?.go(2);
+  expect(api.current?.index).toBe(2);
+  api.current?.go('>');
+  expect(api.current?.index).toBe(0);
+});
+
+it('loop: go("<") at index 0 wraps to maxIndex', () => {
+  const api: { current: SliderApi | null } = { current: null };
+  render(
+    <Harness
+      options={{ perPage: 1, type: 'loop' }}
+      onApi={(a) => {
+        api.current = a;
+      }}
+    />
+  );
+  expect(api.current?.index).toBe(0);
+  api.current?.go('<');
+  expect(api.current?.index).toBe(2);
+});
+
+it('loop: canGoNext and canGoPrev are true at last index', async () => {
+  const captured: { current: SliderContextValue | null } = { current: null };
+  function LoopProbe() {
+    const ctx = useSlider({ options: { perPage: 1, type: 'loop' } });
+    useEffect(() => {
+      ctx.setPageCount(3);
+    }, [ctx.setPageCount]);
+    captured.current = ctx;
+    return (
+      <div
+        ref={ctx.registerScrollElement}
+        style={{ display: 'flex', width: 200, overflowX: 'auto' }}
+      >
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            data-carousel-page="true"
+            style={{ flex: '0 0 200px', width: 200, height: 50 }}
+          >
+            {i}
+          </div>
+        ))}
+      </div>
+    );
+  }
+  render(<LoopProbe />);
+  // Navigate to last page — in slide mode this disables canGoNext; in loop mode it must stay true
+  captured.current?.goTo(2);
+  await vi.waitFor(() => {
+    expect(captured.current?.canGoNext).toBe(true);
+    expect(captured.current?.canGoPrev).toBe(true);
+  });
+});
+
+it('loop: both arrows disabled when maxIndex === 0 (single slide)', async () => {
+  const captured: { current: SliderContextValue | null } = { current: null };
+  function SingleLoopProbe() {
+    const ctx = useSlider({ options: { perPage: 1, type: 'loop' } });
+    useEffect(() => {
+      ctx.setPageCount(1);
+    }, [ctx.setPageCount]);
+    captured.current = ctx;
+    return (
+      <div
+        ref={ctx.registerScrollElement}
+        style={{ display: 'flex', width: 200, overflowX: 'auto' }}
+      >
+        <div data-carousel-page="true" style={{ flex: '0 0 200px', width: 200, height: 50 }}>
+          only
+        </div>
+      </div>
+    );
+  }
+  render(<SingleLoopProbe />);
+  // 1 slide, maxIndex = 0 → maxIndex > 0 is false → arrows disabled even in loop mode
+  await vi.waitFor(() => {
+    expect(captured.current?.canGoNext).toBe(false);
+    expect(captured.current?.canGoPrev).toBe(false);
+  });
+});
+
+it('loop: go(99) past maxIndex wraps to 0', () => {
+  const api: { current: SliderApi | null } = { current: null };
+  render(
+    <Harness
+      options={{ perPage: 1, type: 'loop' }}
+      onApi={(a) => {
+        api.current = a;
+      }}
+    />
+  );
+  api.current?.go(99);
+  expect(api.current?.index).toBe(0);
+});
+
+it('loop: type="slide" still clamps at both boundaries (regression)', () => {
+  const api: { current: SliderApi | null } = { current: null };
+  render(
+    <Harness
+      options={{ perPage: 1, type: 'slide' }}
+      onApi={(a) => {
+        api.current = a;
+      }}
+    />
+  );
+  api.current?.go('<'); // at index 0 → must clamp, stay at 0
+  expect(api.current?.index).toBe(0);
+  api.current?.go(999); // past end → must clamp to 2
+  expect(api.current?.index).toBe(2);
+});

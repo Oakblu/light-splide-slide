@@ -89,18 +89,33 @@ export function useSlider({ options, onMounted, onDestroy }: UseSliderParams): S
       }
       const perMove = resolvePerStep(resolvedOptions);
       const next = resolveNextIndex({ control, currentIndex: currentIndexRef.current, perMove });
-      const clamped = Math.max(0, Math.min(next, maxIndex));
-      if (clamped === currentIndexRef.current) {
+      const isLoop = resolvedOptions.type === 'loop';
+      let targetIndex: number;
+      let scrollBehavior: ScrollBehavior;
+
+      if (isLoop && next < 0) {
+        targetIndex = maxIndex;
+        scrollBehavior = 'instant';
+      } else if (isLoop && next > maxIndex) {
+        targetIndex = 0;
+        scrollBehavior = 'instant';
+      } else {
+        targetIndex = Math.max(0, Math.min(next, maxIndex));
+        scrollBehavior = 'smooth';
+      }
+
+      if (targetIndex === currentIndexRef.current) {
         return;
       }
-      // `clamped` is bounded by maxIndex (the last reachable page), so pages[clamped] always exists.
-      const target = pages[clamped];
+      // targetIndex is bounded by [0, maxIndex] so pages[targetIndex] always exists.
+      const target = pages[targetIndex];
       const targetStart = target.offsetLeft - scrollElement.offsetLeft;
       // When navigating to the last reachable page, scroll flush to the end so any trailing
       // peeking slides are fully revealed rather than cut off at their snap point.
-      const targetLeft = clamped >= maxIndex ? maxScrollLeft : Math.min(targetStart, maxScrollLeft);
-      scrollElement.scrollTo({ behavior: 'smooth', left: targetLeft });
-      emitMoved(clamped);
+      const targetLeft =
+        targetIndex >= maxIndex ? maxScrollLeft : Math.min(targetStart, maxScrollLeft);
+      scrollElement.scrollTo({ behavior: scrollBehavior, left: targetLeft });
+      emitMoved(targetIndex);
     },
     [emitMoved, resolvedOptions]
   );
@@ -130,8 +145,11 @@ export function useSlider({ options, onMounted, onDestroy }: UseSliderParams): S
       : Math.floor(currentIndex / perStep);
 
   return {
-    canGoNext: currentIndex < maxIndex && !isLastChildVisible,
-    canGoPrev: currentIndex > 0,
+    canGoNext:
+      resolvedOptions.type === 'loop'
+        ? maxIndex > 0
+        : currentIndex < maxIndex && !isLastChildVisible,
+    canGoPrev: resolvedOptions.type === 'loop' ? maxIndex > 0 : currentIndex > 0,
     currentIndex,
     currentPageIndex,
     goTo,
