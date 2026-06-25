@@ -13,15 +13,17 @@ import {
 } from 'react';
 import { computeScrollStyle, getGridDimensions, toCssUnit } from '../core';
 import { useSliderContext } from '../slider-context';
+import type { SliderInjectedOptions } from '../types';
 
-type SliderTrackProps = HTMLAttributes<HTMLDivElement> & {
-  className?: string;
-  style?: CSSProperties;
-  scrollClassName?: string;
-  gridClassName?: string;
-  cssGridRows?: number;
-  children?: ReactNode;
-};
+type SliderTrackProps = HTMLAttributes<HTMLDivElement> &
+  SliderInjectedOptions & {
+    className?: string;
+    style?: CSSProperties;
+    scrollClassName?: string;
+    gridClassName?: string;
+    cssGridRows?: number;
+    children?: ReactNode;
+  };
 
 function isGrouped(pages: ReactElement[] | ReactElement[][]): pages is ReactElement[][] {
   return Array.isArray(pages[0]);
@@ -34,6 +36,8 @@ export function SliderTrack({
   gridClassName,
   cssGridRows,
   children,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  __sliderOptions: _ignoredSliderOptions,
   ...rest
 }: SliderTrackProps) {
   const carousel = useSliderContext();

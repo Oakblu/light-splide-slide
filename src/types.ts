@@ -72,3 +72,8 @@ export type SliderProps = Omit<HTMLAttributes<HTMLElement>, 'aria-label'> & {
   onMounted?: (api: SliderApi) => void;
   onDestroy?: () => void;
 };
+
+export type SliderInjectedOptions = {
+  /** Internal: resolved options injected by <Slider> into structural children. Not part of the public API. */
+  __sliderOptions?: SliderOptions;
+};

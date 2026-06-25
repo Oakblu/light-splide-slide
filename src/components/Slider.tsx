@@ -1,7 +1,19 @@
 'use client';
-import { SliderContext } from '../slider-context';
-import type { SliderProps } from '../types';
-import { useSlider } from '../use-slider';
+import { Children, cloneElement, isValidElement } from 'react';
+import { resolveOptions } from '../core';
+import type { SliderInjectedOptions, SliderOptions, SliderProps } from '../types';
+import { SliderRuntime } from './SliderRuntime';
+import { SliderTrack } from './SliderTrack';
+
+function injectIntoTrack(children: SliderProps['children'], options: SliderOptions) {
+  return Children.map(children, (child) => {
+    if (isValidElement<SliderInjectedOptions>(child) && child.type === SliderTrack) {
+      const injected: SliderInjectedOptions = { __sliderOptions: options };
+      return cloneElement(child, injected);
+    }
+    return child;
+  });
+}
 
 export function Slider({
   options,
@@ -13,18 +25,18 @@ export function Slider({
   onDestroy,
   ...rest
 }: SliderProps) {
-  const ctx = useSlider({ options: options ?? {}, onMounted, onDestroy });
+  const resolved = resolveOptions(options ?? {}, null);
   return (
-    <SliderContext.Provider value={ctx}>
-      <section
-        aria-label={ariaLabel}
-        className={className}
-        style={{ position: 'relative', ...style }}
-        {...rest}
-      >
-        {children}
-      </section>
-    </SliderContext.Provider>
+    <section
+      aria-label={ariaLabel}
+      className={className}
+      style={{ position: 'relative', ...style }}
+      {...rest}
+    >
+      <SliderRuntime options={options ?? {}} onMounted={onMounted} onDestroy={onDestroy}>
+        {injectIntoTrack(children, resolved)}
+      </SliderRuntime>
+    </section>
   );
 }
 
