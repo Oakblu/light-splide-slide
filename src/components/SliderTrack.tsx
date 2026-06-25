@@ -97,6 +97,7 @@ export function SliderTrack({
           scrollPaddingRight: paddingRight,
         }
       : {}),
+    ...(carousel.options.drag === false ? { touchAction: 'pan-y' } : {}),
   };
 
   const renderGroupedPage = (page: ReactElement[], pageIndex: number) => {

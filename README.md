@@ -260,7 +260,7 @@ Dot indicators. Renders `null` when `options.pagination` is `false` or unset.
 | Option | Type | Default | Description |
 |---|---|---|---|
 | `arrows` | `boolean` | `true` | Show/hide the default arrow buttons |
-| `drag` | `boolean` | `true` | Enable drag-to-scroll (native scroll behavior) |
+| `drag` | `boolean` | `true` | When `false`, sets `touch-action: pan-y` on the scroll element to disable horizontal touch/trackpad panning. Native mouse drag-to-scroll is not implemented. |
 | `pagination` | `boolean` | `false` | Show pagination dots |
 | `perPage` | `number` | `1` | Slides visible per page |
 | `perMove` | `number` | `1` | Slides to advance per arrow click |
