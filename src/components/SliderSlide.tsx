@@ -1,26 +1,29 @@
-'use client';
+// src/components/SliderSlide.tsx
 import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
 import { toCssUnit } from '../core';
-import { useSliderContext } from '../slider-context';
+import type { SliderInjectedOptions } from '../types';
+
+type SliderSlideProps = HTMLAttributes<HTMLDivElement> &
+  SliderInjectedOptions & { children?: ReactNode };
 
 export function SliderSlide({
   className,
   style,
   children,
+  __sliderOptions,
   ...rest
-}: HTMLAttributes<HTMLDivElement> & { children?: ReactNode }) {
-  const carousel = useSliderContext();
-  if (!carousel) {
+}: SliderSlideProps) {
+  if (!__sliderOptions) {
     return (
       <div className={className} style={style} {...rest}>
         {children}
       </div>
     );
   }
-  const fixedWidth = toCssUnit(carousel.options.fixedWidth);
-  const gap = toCssUnit(carousel.options.gap) ?? '0px';
+  const fixedWidth = toCssUnit(__sliderOptions.fixedWidth);
+  const gap = toCssUnit(__sliderOptions.gap) ?? '0px';
   // v8 ignore next -- perPage is always set by resolveOptions defaults; `?? 1` is unreachable
-  const perPage = carousel.options.perPage ?? 1;
+  const perPage = __sliderOptions.perPage ?? 1;
   const width = fixedWidth
     ? fixedWidth
     : `calc((100% - (${gap} * ${Math.max(perPage - 1, 0)})) / ${perPage})`;
