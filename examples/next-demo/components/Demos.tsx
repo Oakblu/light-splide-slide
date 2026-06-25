@@ -130,6 +130,26 @@ export function Demos() {
           </SliderTrack>
         </Slider>
       </Demo>
+
+      <Demo
+        title="5. Loop mode"
+        description="type='loop' — arrows wrap from last→first and first→last with an instant jump. Both arrows always enabled."
+      >
+        <Slider
+          aria-label="Loop slider"
+          options={{ perPage: 2, gap: '1rem', type: 'loop', pagination: true }}
+        >
+          <SliderArrows />
+          <SliderTrack>
+            {items.map((item) => (
+              <SliderSlide key={item.id}>
+                <Card item={item} />
+              </SliderSlide>
+            ))}
+          </SliderTrack>
+          <SliderPagination />
+        </Slider>
+      </Demo>
     </>
   );
 }
