@@ -175,6 +175,16 @@ it('forwards prevStyle and nextStyle to the respective buttons', () => {
   expect(next.style.color).toBe('blue');
 });
 
+it('arrow SVG has explicit width and height attributes to avoid layout shift before CSS', () => {
+  const { container } = setup();
+  const svgs = container.querySelectorAll<SVGSVGElement>('svg');
+  expect(svgs.length).toBeGreaterThan(0);
+  for (const svg of svgs) {
+    expect(svg.getAttribute('width')).toBe('1em');
+    expect(svg.getAttribute('height')).toBe('1em');
+  }
+});
+
 it('forwards className and style to the arrows container', () => {
   const { container } = setup({ className: 'my-arrows', style: { gap: '8px' } });
   const el = container.querySelector<HTMLElement>('[data-slider-arrows]');

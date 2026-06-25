@@ -79,6 +79,35 @@ it('applies all base structural styles within a slider context', () => {
   expect(slide.style.scrollSnapAlign).toBe('start');
 });
 
+it('skips inline width when a CSS scope id is injected (breakpoints case)', () => {
+  // When Slider has breakpoints it injects __cssId so CSS media queries drive width.
+  // Inline width must be absent or the media queries can never override it.
+  const { container } = render(
+    <Slider aria-label="d" options={{ perPage: 3, breakpoints: { 9999: { perPage: 1 } } }}>
+      <SliderTrack>
+        <SliderSlide>a</SliderSlide>
+      </SliderTrack>
+    </Slider>
+  );
+  const slide = container.querySelector<HTMLElement>('[data-carousel-page="true"]');
+  expect(slide?.style.width).toBe('');
+});
+
+it('still sets structural styles (minWidth, flexShrink, scrollSnapAlign) when __cssId is present', () => {
+  const { container } = render(
+    <Slider aria-label="d" options={{ perPage: 3, breakpoints: { 9999: { perPage: 1 } } }}>
+      <SliderTrack>
+        <SliderSlide>a</SliderSlide>
+      </SliderTrack>
+    </Slider>
+  );
+  const slide = container.querySelector<HTMLElement>('[data-carousel-page="true"]');
+  if (!slide) throw new Error('slide not found');
+  expect(slide.style.minWidth).toBe('0px');
+  expect(slide.style.flexShrink).toBe('0');
+  expect(slide.style.scrollSnapAlign).toBe('start');
+});
+
 it('user style prop overrides base styles and additional props are merged', () => {
   const { container } = render(
     <Slider aria-label="d">

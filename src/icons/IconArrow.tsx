@@ -8,6 +8,8 @@ export function IconArrow({ className, style }: { className?: string; style?: CS
       style={style}
       viewBox="0 0 64 64"
       xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
     >
       <path
         fill="currentColor"

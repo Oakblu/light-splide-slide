@@ -328,3 +328,17 @@ it('grid mode rowGap falls back to outer gap when grid.gap.row is not set', () =
   if (!inner) throw new Error('grid inner div not found');
   expect(inner.style.rowGap).toBe('8px');
 });
+
+it('flat mode: string-type element (native div) gets data-carousel-page without options injection', () => {
+  // Covers the typeof page.type === 'string' branch in renderFlatPage —
+  // native elements can't receive __sliderOptions so they get cloned with only the base attributes.
+  const { container } = render(
+    <Slider aria-label="test">
+      <SliderTrack>
+        <div>native</div>
+      </SliderTrack>
+    </Slider>
+  );
+  const page = container.querySelector('[data-carousel-page="true"]');
+  expect(page?.textContent).toBe('native');
+});

@@ -84,6 +84,101 @@ it('breakpoint overrides slide width: SliderRuntime must re-inject responsive op
   });
 });
 
+it('injects a <style> tag with base and breakpoint CSS when breakpoints are configured', () => {
+  // Two breakpoints ensure the sort comparator is exercised (needs 2+ entries).
+  const { container } = render(
+    <Slider
+      aria-label="d"
+      options={{
+        perPage: 3,
+        gap: '1rem',
+        breakpoints: { 640: { perPage: 1 }, 950: { perPage: 2 } },
+      }}
+    >
+      <SliderTrack>
+        <SliderSlide>a</SliderSlide>
+      </SliderTrack>
+    </Slider>
+  );
+  const styleEl = container.querySelector('style');
+  const css = styleEl?.textContent ?? '';
+  expect(css).toContain('[data-slider-scope=');
+  expect(css).toContain('[data-carousel-page]');
+  expect(css).toContain('@media');
+  expect(css).toContain('max-width:640px');
+  expect(css).toContain('max-width:950px');
+  expect(css).toContain('/ 3)');
+  expect(css).toContain('/ 1)');
+  expect(css).toContain('/ 2)');
+});
+
+it('does not inject a <style> tag when no breakpoints are configured', () => {
+  const { container } = render(
+    <Slider aria-label="d" options={{ perPage: 3 }}>
+      <SliderTrack>
+        <SliderSlide>a</SliderSlide>
+      </SliderTrack>
+    </Slider>
+  );
+  expect(container.querySelector('style')).toBeNull();
+});
+
+it('section gets data-slider-scope attribute only when breakpoints are configured', () => {
+  const { container: withBP } = render(
+    <Slider aria-label="d" options={{ perPage: 2, breakpoints: { 640: { perPage: 1 } } }}>
+      <SliderTrack>
+        <SliderSlide>a</SliderSlide>
+      </SliderTrack>
+    </Slider>
+  );
+  expect(withBP.querySelector('section')?.hasAttribute('data-slider-scope')).toBe(true);
+
+  const { container: noBP } = render(
+    <Slider aria-label="d" options={{ perPage: 2 }}>
+      <SliderTrack>
+        <SliderSlide>a</SliderSlide>
+      </SliderTrack>
+    </Slider>
+  );
+  expect(noBP.querySelector('section')?.hasAttribute('data-slider-scope')).toBe(false);
+});
+
+it('generates min-width media queries for mediaQuery: min', () => {
+  // Two breakpoints exercise both the sort comparator and the a-b (ascending) branch.
+  const { container } = render(
+    <Slider
+      aria-label="d"
+      options={{
+        perPage: 1,
+        gap: '0.5rem',
+        mediaQuery: 'min',
+        breakpoints: { 768: { perPage: 3 }, 480: { perPage: 2 } },
+      }}
+    >
+      <SliderTrack>
+        <SliderSlide>a</SliderSlide>
+      </SliderTrack>
+    </Slider>
+  );
+  const css = container.querySelector('style')?.textContent ?? '';
+  expect(css).toContain('min-width:480px');
+  expect(css).toContain('min-width:768px');
+  expect(css).toContain('/ 2)');
+  expect(css).toContain('/ 3)');
+});
+
+it('uses fixedWidth in base CSS when fixedWidth option is set', () => {
+  const { container } = render(
+    <Slider aria-label="d" options={{ fixedWidth: '14rem', breakpoints: { 640: { perPage: 1 } } }}>
+      <SliderTrack>
+        <SliderSlide>a</SliderSlide>
+      </SliderTrack>
+    </Slider>
+  );
+  const css = container.querySelector('style')?.textContent ?? '';
+  expect(css).toContain('14rem');
+});
+
 it('user style merges into section alongside position: relative', () => {
   const { container } = render(
     <Slider aria-label="test" style={{ color: 'blue', padding: '10px' }}>

@@ -57,6 +57,7 @@ export function SliderTrack({
   cssGridRows,
   children,
   __sliderOptions,
+  __cssId,
   ...rest
 }: SliderTrackProps) {
   if (!__sliderOptions) {
@@ -123,6 +124,7 @@ export function SliderTrack({
     const injected: typeof base & SliderInjectedOptions = {
       ...base,
       __sliderOptions: options,
+      ...(__cssId !== undefined ? { __cssId } : {}),
     };
     return cloneElement(page, injected);
   };
