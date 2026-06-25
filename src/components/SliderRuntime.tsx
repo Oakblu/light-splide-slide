@@ -1,5 +1,6 @@
 'use client';
 import { type ReactNode, useEffect, useLayoutEffect, useRef } from 'react';
+import { computeScrollStyle } from '../core';
 import { SliderContext } from '../slider-context';
 import type { SliderApi, SliderOptions } from '../types';
 import { useSlider } from '../use-slider';
@@ -15,6 +16,7 @@ export function SliderRuntime({ options, onMounted, onDestroy, children }: Slide
   const ctx = useSlider({ options, onMounted, onDestroy });
   const rootRef = useRef<HTMLDivElement | null>(null);
   const { registerScrollElement, setPageCount } = ctx;
+  const resolvedOptions = ctx.options;
 
   // Register the scroll element synchronously (layout phase) so that the event
   // listeners in useScrollSync / useReachableCount / useLastChildVisibility —
@@ -41,6 +43,23 @@ export function SliderRuntime({ options, onMounted, onDestroy, children }: Slide
     setPageCount(root.querySelectorAll('[data-carousel-page]').length);
   });
 
+  // Responsive: when resolved options change across a breakpoint on the client, re-apply
+  // the scroll container's style + custom properties (the server rendered base options).
+  useEffect(() => {
+    const root = rootRef.current;
+    const scroll = root?.querySelector<HTMLDivElement>('[data-slider-scroll]');
+    if (!scroll) {
+      return;
+    }
+    const { style, cssVars } = computeScrollStyle(resolvedOptions);
+    for (const [key, value] of Object.entries(style)) {
+      scroll.style.setProperty(camelToKebab(key), String(value));
+    }
+    for (const [key, value] of Object.entries(cssVars)) {
+      scroll.style.setProperty(key, value);
+    }
+  }, [resolvedOptions]);
+
   return (
     <SliderContext.Provider value={ctx}>
       <div ref={rootRef} data-slider-runtime="" style={{ display: 'contents' }}>
@@ -48,6 +67,10 @@ export function SliderRuntime({ options, onMounted, onDestroy, children }: Slide
       </div>
     </SliderContext.Provider>
   );
+}
+
+function camelToKebab(key: string): string {
+  return key.replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`);
 }
 
 export default SliderRuntime;

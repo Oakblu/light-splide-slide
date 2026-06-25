@@ -50,3 +50,20 @@ it('wrapper uses display: contents so it is layout-transparent', () => {
   if (!wrapper) throw new Error('runtime wrapper not found');
   expect(wrapper.style.display).toBe('contents');
 });
+
+it('applies scroll styles imperatively from resolved options on mount', async () => {
+  const { container } = render(
+    <SliderRuntime options={{ gap: '12px', padding: { left: '20px', right: '10px' } }}>
+      <div data-slider-scroll="">
+        <div data-carousel-page="true">a</div>
+      </div>
+    </SliderRuntime>
+  );
+  const scroll = container.querySelector<HTMLElement>('[data-slider-scroll]');
+  if (!scroll) throw new Error('scroll not found');
+  await vi.waitFor(() => {
+    expect(scroll.style.gap).toBe('12px');
+    expect(scroll.style.paddingLeft).toBe('20px');
+    expect(scroll.style.getPropertyValue('--slider-gap')).toBe('12px');
+  });
+});

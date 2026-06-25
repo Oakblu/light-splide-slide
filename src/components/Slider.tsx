@@ -1,6 +1,5 @@
-'use client';
-import { Children, cloneElement, isValidElement } from 'react';
-import { resolveOptions } from '../core';
+import { Children, type CSSProperties, cloneElement, isValidElement } from 'react';
+import { computeScrollStyle, resolveOptions } from '../core';
 import type { SliderInjectedOptions, SliderOptions, SliderProps } from '../types';
 import { SliderRuntime } from './SliderRuntime';
 import { SliderTrack } from './SliderTrack';
@@ -26,13 +25,14 @@ export function Slider({
   ...rest
 }: SliderProps) {
   const resolved = resolveOptions(options ?? {}, null);
+  const { cssVars } = computeScrollStyle(resolved);
+  const sectionStyle: CSSProperties & Record<`--${string}`, string> = {
+    position: 'relative',
+    ...cssVars,
+    ...style,
+  };
   return (
-    <section
-      aria-label={ariaLabel}
-      className={className}
-      style={{ position: 'relative', ...style }}
-      {...rest}
-    >
+    <section aria-label={ariaLabel} className={className} style={sectionStyle} {...rest}>
       <SliderRuntime options={options ?? {}} onMounted={onMounted} onDestroy={onDestroy}>
         {injectIntoTrack(children, resolved)}
       </SliderRuntime>
