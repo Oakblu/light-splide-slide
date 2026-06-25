@@ -4,11 +4,11 @@ import {
   getMaxIndex,
   getNearestPageIndex,
   getPaginationCount,
-  getReachablePageCount,
   resolveNextIndex,
   resolveOptions,
   resolvePerStep,
 } from './core';
+import { readPageGeometry } from './page-geometry';
 import { createResponsiveStore } from './responsive-store';
 import {
   NavigationAction,
@@ -64,16 +64,12 @@ export function useSlider({
 
   const measure = useCallback(() => {
     const scrollElement = scrollElementRef.current;
-    const pages = scrollElement
-      ? Array.from(scrollElement.querySelectorAll<HTMLElement>('[data-carousel-page="true"]'))
-      : [];
-    if (!scrollElement || !pages.length) {
+    if (!scrollElement) {
       setReachableCount(null);
       return;
     }
-    const offsets = pages.map((page) => page.offsetLeft);
-    const maxScrollLeft = scrollElement.scrollWidth - scrollElement.clientWidth;
-    setReachableCount(getReachablePageCount(offsets, maxScrollLeft));
+    const { pages, reachableCount } = readPageGeometry(scrollElement);
+    setReachableCount(pages.length ? reachableCount : null);
   }, []);
 
   const emitMoved = useCallback((index: number) => {
@@ -90,29 +86,18 @@ export function useSlider({
       if (!scrollElement) {
         return;
       }
-      const pageElements = Array.from(
-        scrollElement.querySelectorAll<HTMLElement>('[data-carousel-page="true"]')
-      );
-      if (!pageElements.length) {
+      const { pages, maxScrollLeft, maxIndex } = readPageGeometry(scrollElement);
+      if (!pages.length) {
         return;
       }
-      const maxScrollLeft = scrollElement.scrollWidth - scrollElement.clientWidth;
-      const maxIndex =
-        getReachablePageCount(
-          pageElements.map((page) => page.offsetLeft),
-          maxScrollLeft
-        ) - 1;
       const perMove = resolvePerStep(resolvedOptions);
       const next = resolveNextIndex({ control, currentIndex: currentIndexRef.current, perMove });
       const clamped = Math.max(0, Math.min(next, maxIndex));
       if (clamped === currentIndexRef.current) {
         return;
       }
-      // clamped is bounded by the reachable page count, so the target always exists.
-      const target = pageElements[clamped];
+      const target = pages[clamped];
       const targetStart = target.offsetLeft - scrollElement.offsetLeft;
-      // The last reachable page scrolls flush to the end so trailing peeking
-      // slides are fully revealed instead of being cut off at the snap point.
       const targetLeft = clamped >= maxIndex ? maxScrollLeft : Math.min(targetStart, maxScrollLeft);
       scrollElement.scrollTo({ behavior: 'smooth', left: targetLeft });
       emitMoved(clamped);
@@ -153,19 +138,11 @@ export function useSlider({
     const handle = () => {
       window.clearTimeout(settleTimer);
       settleTimer = window.setTimeout(() => {
-        const pages = Array.from(
-          scrollElement.querySelectorAll<HTMLElement>('[data-carousel-page="true"]')
-        );
+        const { pages, maxIndex } = readPageGeometry(scrollElement);
         const nearest = getNearestPageIndex(pages, scrollElement.scrollLeft);
         if (nearest === null) {
           return;
         }
-        const maxScrollLeft = scrollElement.scrollWidth - scrollElement.clientWidth;
-        const maxIndex =
-          getReachablePageCount(
-            pages.map((page) => page.offsetLeft),
-            maxScrollLeft
-          ) - 1;
         const clamped = Math.min(nearest, Math.max(maxIndex, 0));
         if (clamped === currentIndexRef.current) {
           return;
