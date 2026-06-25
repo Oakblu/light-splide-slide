@@ -1,6 +1,6 @@
 {
   "name": "light-splide-slide",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Headless, SSR-safe, dependency-light React slider/carousel built on native scroll-snap.",
   "license": "MIT",
   "type": "module",
