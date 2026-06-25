@@ -14,5 +14,5 @@
     "noEmit": true
   },
   "include": ["src", "examples", "*.config.ts"],
-  "exclude": ["examples/vite-demo"]
+  "exclude": ["examples/vite-demo", "examples/next-demo"]
 }
