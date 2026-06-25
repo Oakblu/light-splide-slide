@@ -35,26 +35,29 @@ export function SliderTrack({
   children,
 }: SliderTrackProps) {
   const carousel = useSliderContext();
-  const slideChildren = Children.toArray(children).filter(isValidElement);
-  const gridDimensions = getGridDimensions(carousel?.options.grid);
+  const gridDimensions = useMemo(
+    () => getGridDimensions(carousel?.options.grid),
+    [carousel?.options.grid]
+  );
 
   const pages = useMemo<ReactElement[] | ReactElement[][]>(() => {
+    const slides = Children.toArray(children).filter(isValidElement);
     if (cssGridRows) {
       const cols: ReactElement[][] = [];
-      for (let i = 0; i < slideChildren.length; i += cssGridRows) {
-        cols.push(slideChildren.slice(i, i + cssGridRows));
+      for (let i = 0; i < slides.length; i += cssGridRows) {
+        cols.push(slides.slice(i, i + cssGridRows));
       }
       return cols;
     }
     if (!gridDimensions) {
-      return slideChildren;
+      return slides;
     }
     const grouped: ReactElement[][] = [];
-    for (let i = 0; i < slideChildren.length; i += gridDimensions.itemsPerPage) {
-      grouped.push(slideChildren.slice(i, i + gridDimensions.itemsPerPage));
+    for (let i = 0; i < slides.length; i += gridDimensions.itemsPerPage) {
+      grouped.push(slides.slice(i, i + gridDimensions.itemsPerPage));
     }
     return grouped;
-  }, [cssGridRows, gridDimensions, slideChildren]);
+  }, [children, cssGridRows, gridDimensions]);
 
   const pageCount = pages.length;
   useEffect(() => {
