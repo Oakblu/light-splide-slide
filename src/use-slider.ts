@@ -93,8 +93,9 @@ export function useSlider({
         return;
       }
       scrollElement.scrollTo({ behavior: 'smooth', left: target.offsetLeft - scrollElement.offsetLeft });
+      emitMoved(clamped);
     },
-    [pageCount, resolvedOptions]
+    [emitMoved, pageCount, resolvedOptions]
   );
 
   const prev = useCallback(() => goTo(NavigationAction.Prev), [goTo]);
@@ -158,12 +159,8 @@ export function useSlider({
     );
     update();
     observer.observe(lastChild);
-    scrollElement.addEventListener('scroll', update, { passive: true });
-    window.addEventListener('resize', update);
     return () => {
       observer.disconnect();
-      scrollElement.removeEventListener('scroll', update);
-      window.removeEventListener('resize', update);
     };
   }, [pageCount]);
 

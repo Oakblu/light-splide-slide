@@ -55,8 +55,11 @@ it('exposes an imperative api on mount and go() scrolls', async () => {
   const moved = vi.fn();
   const off = api.current?.on('moved', moved);
   api.current?.go('>');
-  await vi.waitFor(() => expect(api.current?.index).toBe(1));
+  // index updates deterministically via emitMoved — no scroll event required
+  expect(api.current?.index).toBe(1);
   expect(moved).toHaveBeenCalledWith(1);
+  // waitFor still holds: React state flush confirms canGoPrev/canGoNext update too
+  await vi.waitFor(() => expect(api.current?.index).toBe(1));
   off?.();
 });
 
