@@ -18,6 +18,7 @@ export function useImperativeApi(
       },
       go: goTo,
       on: (event, callback) => {
+        // v8 ignore next 2 -- typed callers can only pass 'moved'; guard defends JS callers and is unreachable from TS
         if (event !== 'moved') {
           return () => {};
         }

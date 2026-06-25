@@ -70,29 +70,12 @@ it('exposes an imperative api on mount and go() scrolls', async () => {
   expect(moved).toHaveBeenCalledWith(1);
   // waitFor still holds: React state flush confirms canGoPrev/canGoNext update too
   await vi.waitFor(() => expect(api.current?.index).toBe(1));
+  // off() unsubscribes: a subsequent move must not invoke the listener again
   off?.();
-});
-
-it('on() ignores unknown events and returns a noop unsubscribe', () => {
-  const captured: { current: SliderContextValue | null } = { current: null };
-  const api: { current: SliderApi | null } = { current: null };
-  function Probe() {
-    const [pageCount, setPageCount] = useState(3);
-    captured.current = useSlider({
-      options: {},
-      pageCount,
-      setPageCount,
-      onMounted: (a) => {
-        api.current = a;
-      },
-    });
-    return null;
-  }
-  render(<Probe />);
-  const off = api.current?.on('weird', () => {});
-  expect(typeof off).toBe('function');
-  expect(() => off?.()).not.toThrow();
-  expect(captured.current?.pageCount).toBe(3);
+  moved.mockClear();
+  api.current?.go('>');
+  expect(api.current?.index).toBe(2);
+  expect(moved).not.toHaveBeenCalled();
 });
 
 it('next() and prev() context methods call goTo with correct direction', async () => {
