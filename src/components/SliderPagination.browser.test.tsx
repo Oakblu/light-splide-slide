@@ -60,6 +60,69 @@ it('emits no data-testid by default (opt-in)', () => {
   expect(container.querySelector('[data-testid]')).toBeNull();
 });
 
+it('data-slider-pagination attribute has empty string value', () => {
+  const { container } = render(
+    <Slider aria-label="d" options={{ perPage: 1, pagination: true }}>
+      <SliderTrack>
+        <SliderSlide>a</SliderSlide>
+      </SliderTrack>
+      <SliderPagination />
+    </Slider>
+  );
+  const el = container.querySelector('[data-slider-pagination]');
+  expect(el?.getAttribute('data-slider-pagination')).toBe('');
+});
+
+it('dots have aria-hidden="true"', () => {
+  const { container } = render(
+    <Slider aria-label="d" options={{ perPage: 1, pagination: true }}>
+      <SliderTrack>
+        <SliderSlide>a</SliderSlide>
+        <SliderSlide>b</SliderSlide>
+      </SliderTrack>
+      <SliderPagination />
+    </Slider>
+  );
+  const dots = container.querySelectorAll('[data-slider-dot]');
+  expect(dots.length).toBeGreaterThan(0);
+  for (const dot of dots) {
+    expect(dot.getAttribute('aria-hidden')).toBe('true');
+  }
+});
+
+it('forwards dotClassName and dotStyle to each dot', () => {
+  const { container } = render(
+    <Slider aria-label="d" options={{ perPage: 1, pagination: true }}>
+      <SliderTrack>
+        <SliderSlide>a</SliderSlide>
+        <SliderSlide>b</SliderSlide>
+      </SliderTrack>
+      <SliderPagination dotClassName="my-dot" dotStyle={{ background: 'red' }} />
+    </Slider>
+  );
+  const dots = container.querySelectorAll('[data-slider-dot]');
+  expect(dots.length).toBeGreaterThan(0);
+  for (const dot of dots) {
+    expect(dot.className).toContain('my-dot');
+    expect((dot as HTMLElement).style.background).toBe('red');
+  }
+});
+
+it('forwards className and style to the pagination container', () => {
+  const { container } = render(
+    <Slider aria-label="d" options={{ perPage: 1, pagination: true }}>
+      <SliderTrack>
+        <SliderSlide>a</SliderSlide>
+      </SliderTrack>
+      <SliderPagination className="my-pagination" style={{ color: 'blue' }} />
+    </Slider>
+  );
+  const el = container.querySelector<HTMLElement>('[data-slider-pagination]');
+  if (!el) throw new Error('pagination container not found');
+  expect(el.className).toContain('my-pagination');
+  expect(el.style.color).toBe('blue');
+});
+
 it('renderDot render prop is called for each dot', () => {
   const { container } = render(
     <Slider aria-label="d" options={{ perPage: 1, pagination: true }}>

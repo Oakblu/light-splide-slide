@@ -202,3 +202,129 @@ it('emits no data-testid by default (opt-in)', () => {
   const { container } = makeSlider({ perPage: 1 }, 3);
   expect(container.querySelector('[data-testid]')).toBeNull();
 });
+
+it('scroll container has all baseline structural styles', () => {
+  const { container } = makeSlider({ perPage: 1 }, 2);
+  const scroll = container.querySelector<HTMLElement>('[data-slider-scroll]');
+  if (!scroll) throw new Error('scroll element not found');
+  expect(scroll.style.display).toBe('flex');
+  expect(scroll.style.scrollSnapType).toBe('x mandatory');
+  expect(scroll.style.overflowX).toBe('auto');
+  expect(scroll.style.overflowY).toBe('hidden');
+  expect(scroll.style.overscrollBehaviorX).toBe('contain');
+  expect(scroll.style.scrollbarWidth).toBe('none');
+  expect(scroll.style.scrollBehavior).toBe('smooth');
+});
+
+it('data-slider-scroll attribute has empty string value', () => {
+  const { container } = makeSlider({ perPage: 1 }, 2);
+  const scroll = container.querySelector('[data-slider-scroll]');
+  expect(scroll?.getAttribute('data-slider-scroll')).toBe('');
+});
+
+it('outer wrapper has overflow: hidden', () => {
+  const { container } = makeSlider({ perPage: 1 }, 2);
+  const outer = container.querySelector<HTMLElement>('[data-slider-scroll]')?.parentElement;
+  if (!outer) throw new Error('outer wrapper not found');
+  expect(outer.style.overflow).toBe('hidden');
+});
+
+it('user style merges onto outer wrapper without removing overflow: hidden', () => {
+  const { container } = makeSlider({ perPage: 1 }, 2, { style: { color: 'red', padding: '4px' } });
+  const outer = container.querySelector<HTMLElement>('[data-slider-scroll]')?.parentElement;
+  if (!outer) throw new Error('outer wrapper not found');
+  expect(outer.style.overflow).toBe('hidden');
+  expect(outer.style.color).toBe('red');
+  expect(outer.style.padding).toBe('4px');
+});
+
+it('scroll container exposes CSS custom properties for gap and padding', () => {
+  const { container } = makeSlider({ gap: '12px', padding: { left: '20px', right: '10px' } }, 2);
+  const scroll = container.querySelector<HTMLElement>('[data-slider-scroll]');
+  if (!scroll) throw new Error('scroll element not found');
+  const style = getComputedStyle(scroll);
+  expect(style.getPropertyValue('--slider-gap').trim()).toBe('12px');
+  expect(style.getPropertyValue('--slider-padding-left').trim()).toBe('20px');
+  expect(style.getPropertyValue('--slider-padding-right').trim()).toBe('10px');
+});
+
+it('CSS custom properties default to 0px when gap and padding are not set', () => {
+  const { container } = makeSlider({}, 2);
+  const scroll = container.querySelector<HTMLElement>('[data-slider-scroll]');
+  if (!scroll) throw new Error('scroll element not found');
+  const style = getComputedStyle(scroll);
+  expect(style.getPropertyValue('--slider-gap').trim()).toBe('0px');
+  expect(style.getPropertyValue('--slider-padding-left').trim()).toBe('0px');
+  expect(style.getPropertyValue('--slider-padding-right').trim()).toBe('0px');
+});
+
+it('padding option also sets scrollPaddingLeft and scrollPaddingRight', () => {
+  const { container } = makeSlider({ padding: { left: '20px', right: '10px' } }, 2);
+  const scroll = container.querySelector<HTMLElement>('[data-slider-scroll]');
+  if (!scroll) throw new Error('scroll element not found');
+  expect(scroll.style.scrollPaddingLeft).toBe('20px');
+  expect(scroll.style.scrollPaddingRight).toBe('10px');
+});
+
+it('no padding option leaves scrollPaddingLeft and scrollPaddingRight unset', () => {
+  const { container } = makeSlider({}, 2);
+  const scroll = container.querySelector<HTMLElement>('[data-slider-scroll]');
+  if (!scroll) throw new Error('scroll element not found');
+  expect(scroll.style.scrollPaddingLeft).toBe('');
+  expect(scroll.style.scrollPaddingRight).toBe('');
+});
+
+it('grid page wrapper has all required structural styles', () => {
+  const { container } = makeSlider({ grid: { dimensions: [[2, 2]] } }, 4);
+  const page = container.querySelector<HTMLElement>('[data-carousel-page="true"]');
+  if (!page) throw new Error('grid page wrapper not found');
+  expect(page.style.width).toBe('100%');
+  expect(page.style.minWidth).toBe('0px');
+  expect(page.style.scrollSnapAlign).toBe('start');
+  expect(page.style.flexGrow).toBe('0');
+  expect(page.style.flexShrink).toBe('0');
+  expect(page.style.flexBasis).toBe('100%');
+});
+
+it('gridClassName is forwarded to every grid page wrapper', () => {
+  const { container } = makeSlider({ grid: { dimensions: [[2, 2]] } }, 4, {
+    gridClassName: 'my-page',
+  });
+  const pages = container.querySelectorAll<HTMLElement>('[data-carousel-page="true"]');
+  expect(pages.length).toBeGreaterThan(0);
+  for (const page of pages) {
+    expect(page.className).toContain('my-page');
+  }
+});
+
+it('cssGridRows inner wrapper has height: 100%', () => {
+  const { container } = makeSlider(undefined, 4, { cssGridRows: 2 });
+  const page = container.querySelector<HTMLElement>('[data-carousel-page="true"]');
+  const inner = page?.querySelector<HTMLElement>('div');
+  if (!inner) throw new Error('cssGridRows inner div not found');
+  expect(inner.style.height).toBe('100%');
+});
+
+it('cssGridRows rowGap falls back to outer gap when grid.gap.row is not set', () => {
+  const { container } = makeSlider({ gap: '8px' }, 4, { cssGridRows: 2 });
+  const page = container.querySelector<HTMLElement>('[data-carousel-page="true"]');
+  const inner = page?.querySelector<HTMLElement>('div');
+  if (!inner) throw new Error('cssGridRows inner div not found');
+  expect(inner.style.rowGap).toBe('8px');
+});
+
+it('grid mode columnGap falls back to outer gap when grid.gap.col is not set', () => {
+  const { container } = makeSlider({ gap: '8px', grid: { dimensions: [[2, 2]] } }, 4);
+  const page = container.querySelector<HTMLElement>('[data-carousel-page="true"]');
+  const inner = page?.querySelector<HTMLElement>('div');
+  if (!inner) throw new Error('grid inner div not found');
+  expect(inner.style.columnGap).toBe('8px');
+});
+
+it('grid mode rowGap falls back to outer gap when grid.gap.row is not set', () => {
+  const { container } = makeSlider({ gap: '8px', grid: { dimensions: [[2, 2]] } }, 4);
+  const page = container.querySelector<HTMLElement>('[data-carousel-page="true"]');
+  const inner = page?.querySelector<HTMLElement>('div');
+  if (!inner) throw new Error('grid inner div not found');
+  expect(inner.style.rowGap).toBe('8px');
+});

@@ -133,6 +133,56 @@ it('rest props do not override the component’s own contract attributes', () =>
   expect(el?.getAttribute('data-slider-arrows')).toBe('');
 });
 
+it('data-slider-arrows attribute has empty string value', () => {
+  const { container } = setup();
+  const el = container.querySelector('[data-slider-arrows]');
+  expect(el?.getAttribute('data-slider-arrows')).toBe('');
+});
+
+it('both default buttons have the correct data-direction attribute', () => {
+  const { container } = setup();
+  expect(container.querySelector('[data-direction="prev"]')).toBeTruthy();
+  expect(container.querySelector('[data-direction="next"]')).toBeTruthy();
+});
+
+it('next button has data-disabled="false" at start when canGoNext is true', () => {
+  const { container } = setup();
+  const next = container.querySelector<HTMLButtonElement>('[data-direction="next"]');
+  expect(next?.getAttribute('data-disabled')).toBe('false');
+  expect(next?.disabled).toBe(false);
+});
+
+it('data-hide-on-mobile defaults to "false"', () => {
+  const { container } = setup();
+  expect(container.querySelector('[data-hide-on-mobile="false"]')).toBeTruthy();
+});
+
+it('forwards prevClassName and nextClassName to the respective buttons', () => {
+  const { container } = setup({ prevClassName: 'btn-prev', nextClassName: 'btn-next' });
+  expect(container.querySelector('[data-direction="prev"]')?.className).toContain('btn-prev');
+  expect(container.querySelector('[data-direction="next"]')?.className).toContain('btn-next');
+});
+
+it('forwards prevStyle and nextStyle to the respective buttons', () => {
+  const { container } = setup({
+    prevStyle: { color: 'red' },
+    nextStyle: { color: 'blue' },
+  });
+  const prev = container.querySelector<HTMLElement>('[data-direction="prev"]');
+  const next = container.querySelector<HTMLElement>('[data-direction="next"]');
+  if (!prev || !next) throw new Error('buttons not found');
+  expect(prev.style.color).toBe('red');
+  expect(next.style.color).toBe('blue');
+});
+
+it('forwards className and style to the arrows container', () => {
+  const { container } = setup({ className: 'my-arrows', style: { gap: '8px' } });
+  const el = container.querySelector<HTMLElement>('[data-slider-arrows]');
+  if (!el) throw new Error('arrows container not found');
+  expect(el.className).toContain('my-arrows');
+  expect(el.style.gap).toBe('8px');
+});
+
 it('renders with noop handlers when rendered outside a Slider context', () => {
   // carousel is null → arrowsEnabled defaults to true, handlers fall back to noop
   const { container } = render(<SliderArrows />);

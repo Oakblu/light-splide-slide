@@ -63,3 +63,36 @@ it('uses calc width with default perPage (no perPage option set)', () => {
   // perPage defaults to 1 → calc((100% - (0px * 0)) / 1)
   expect(slide?.style.width).toContain('calc(');
 });
+
+it('applies all base structural styles within a slider context', () => {
+  const { container } = render(
+    <Slider aria-label="d">
+      <SliderTrack>
+        <SliderSlide>a</SliderSlide>
+      </SliderTrack>
+    </Slider>
+  );
+  const slide = container.querySelector<HTMLElement>('[data-carousel-page="true"]');
+  if (!slide) throw new Error('slide not found');
+  expect(slide.style.minWidth).toBe('0px');
+  expect(slide.style.flexShrink).toBe('0');
+  expect(slide.style.scrollSnapAlign).toBe('start');
+});
+
+it('user style prop overrides base styles and additional props are merged', () => {
+  const { container } = render(
+    <Slider aria-label="d">
+      <SliderTrack>
+        <SliderSlide style={{ scrollSnapAlign: 'end', color: 'blue' }}>a</SliderSlide>
+      </SliderTrack>
+    </Slider>
+  );
+  const slide = container.querySelector<HTMLElement>('[data-carousel-page="true"]');
+  if (!slide) throw new Error('slide not found');
+  // user override wins
+  expect(slide.style.scrollSnapAlign).toBe('end');
+  expect(slide.style.color).toBe('blue');
+  // base styles that were not overridden are still present
+  expect(slide.style.minWidth).toBe('0px');
+  expect(slide.style.flexShrink).toBe('0');
+});

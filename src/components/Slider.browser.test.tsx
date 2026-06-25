@@ -42,3 +42,31 @@ it('forwards scrollClassName to the scroll container', () => {
   );
   expect(container.querySelector('.scroller')).toBeTruthy();
 });
+
+it('section has position: relative', () => {
+  const { container } = render(
+    <Slider aria-label="test">
+      <SliderTrack>
+        <SliderSlide>a</SliderSlide>
+      </SliderTrack>
+    </Slider>
+  );
+  const section = container.querySelector<HTMLElement>('section');
+  if (!section) throw new Error('section not found');
+  expect(section.style.position).toBe('relative');
+});
+
+it('user style merges into section alongside position: relative', () => {
+  const { container } = render(
+    <Slider aria-label="test" style={{ color: 'blue', padding: '10px' }}>
+      <SliderTrack>
+        <SliderSlide>a</SliderSlide>
+      </SliderTrack>
+    </Slider>
+  );
+  const section = container.querySelector<HTMLElement>('section');
+  if (!section) throw new Error('section not found');
+  expect(section.style.position).toBe('relative');
+  expect(section.style.color).toBe('blue');
+  expect(section.style.padding).toBe('10px');
+});
