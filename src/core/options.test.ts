@@ -35,9 +35,13 @@ describe('mergeOptions', () => {
     const r = mergeOptions({ padding: { left: '1rem', right: '1rem' } }, { padding: { right: '2rem' } });
     expect(r.padding).toEqual({ left: '1rem', right: '2rem' });
   });
-  it('normalizes scalar padding into both sides', () => {
+  it('normalizes scalar base padding and preserves unspecified override side', () => {
     const r = mergeOptions({ padding: '1rem' }, { padding: { left: '2rem' } });
-    expect(r.padding).toEqual({ left: '2rem', right: undefined });
+    expect(r.padding).toEqual({ left: '2rem', right: '1rem' });
+  });
+  it('object override of only one side keeps the other side from base', () => {
+    const r = mergeOptions({ padding: { left: '1rem', right: '1rem' } }, { padding: { left: '2rem' } });
+    expect(r.padding).toEqual({ left: '2rem', right: '1rem' });
   });
   it('deep-merges grid gap', () => {
     const r = mergeOptions({ grid: { gap: { row: '1px' } } }, { grid: { gap: { col: '2px' } } });

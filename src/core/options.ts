@@ -17,15 +17,9 @@ function mergePadding(
     return undefined;
   }
   const nb = typeof base === 'object' ? base : { left: base, right: base };
-  if (typeof override !== 'object') {
-    // Scalar override: normalize to both sides
-    return { left: override, right: override };
-  }
-  // Object override: merge with partial override
-  const result: SliderPadding = {};
-  result.left = 'left' in override ? override.left : nb.left;
-  result.right = 'right' in override ? override.right : undefined;
-  return result;
+  const no = typeof override === 'object' ? override : { left: override, right: override };
+  // Override's specified sides win; unspecified sides fall back to base.
+  return { ...nb, ...no };
 }
 
 function mergeGrid(base?: SliderGrid, override?: SliderGrid): SliderGrid | undefined {
