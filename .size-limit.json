@@ -1,0 +1,14 @@
+[
+  {
+    "name": "ESM entry (gzip)",
+    "path": "dist/index.js",
+    "limit": "5 kB",
+    "gzip": true
+  },
+  {
+    "name": "Baseline stylesheet",
+    "path": "dist/styles.css",
+    "limit": "1 kB",
+    "gzip": true
+  }
+]
