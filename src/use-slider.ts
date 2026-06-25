@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { useCallback, useMemo, useRef, useSyncExternalStore } from 'react';
 import {
   getMaxIndex,
   getPaginationCount,
@@ -13,6 +13,7 @@ import { useReachableCount } from './hooks/use-reachable-count';
 import { useScrollSync } from './hooks/use-scroll-sync';
 import { readPageGeometry } from './page-geometry';
 import { createResponsiveStore } from './responsive-store';
+import { createSliderStore } from './slider-store';
 import type { SliderApi, SliderContextValue, SliderControl, SliderOptions } from './types';
 
 type UseSliderParams = {
@@ -22,41 +23,59 @@ type UseSliderParams = {
 };
 
 export function useSlider({ options, onMounted, onDestroy }: UseSliderParams): SliderContextValue {
-  const [pageCount, setPageCount] = useState(0);
+  const store = useMemo(() => createSliderStore(), []);
+  const state = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getServerSnapshot);
+  const { currentIndex, pageCount, reachableCount, isLastChildVisible } = state;
+
   const breakpointWidths = useMemo(
     () => Object.keys(options.breakpoints ?? {}).map(Number),
     [options.breakpoints]
   );
-  const store = useMemo(
+  const responsiveStore = useMemo(
     () => createResponsiveStore(breakpointWidths, options.mediaQuery),
     [breakpointWidths, options.mediaQuery]
   );
   const viewportWidth = useSyncExternalStore(
-    store.subscribe,
-    store.getSnapshot,
-    store.getServerSnapshot
+    responsiveStore.subscribe,
+    responsiveStore.getSnapshot,
+    responsiveStore.getServerSnapshot
   );
   const resolvedOptions = useMemo(
     () => resolveOptions(options, viewportWidth),
     [options, viewportWidth]
   );
 
-  const [currentIndex, setCurrentIndex] = useState(0);
   const currentIndexRef = useRef(0);
   const scrollElementRef = useRef<HTMLDivElement | null>(null);
   const listenersRef = useRef(new Set<(i: number) => void>());
+
+  const setPageCount = useCallback(
+    (count: number) => store.setState({ pageCount: count }),
+    [store]
+  );
+  const setReachableCount = useCallback(
+    (count: number | null) => store.setState({ reachableCount: count }),
+    [store]
+  );
+  const setIsLastChildVisible = useCallback(
+    (visible: boolean) => store.setState({ isLastChildVisible: visible }),
+    [store]
+  );
 
   const registerScrollElement = useCallback((el: HTMLDivElement | null) => {
     scrollElementRef.current = el;
   }, []);
 
-  const emitMoved = useCallback((index: number) => {
-    currentIndexRef.current = index;
-    setCurrentIndex(index);
-    for (const l of listenersRef.current) {
-      l(index);
-    }
-  }, []);
+  const emitMoved = useCallback(
+    (index: number) => {
+      currentIndexRef.current = index;
+      store.setState({ currentIndex: index });
+      for (const l of listenersRef.current) {
+        l(index);
+      }
+    },
+    [store]
+  );
 
   const goTo = useCallback(
     (control: SliderControl) => {
@@ -74,11 +93,8 @@ export function useSlider({ options, onMounted, onDestroy }: UseSliderParams): S
       if (clamped === currentIndexRef.current) {
         return;
       }
-      // `clamped` is bounded by maxIndex (the last reachable page), so pages[clamped] always exists.
       const target = pages[clamped];
       const targetStart = target.offsetLeft - scrollElement.offsetLeft;
-      // When navigating to the last reachable page, scroll flush to the end so any trailing
-      // peeking slides are fully revealed rather than cut off at their snap point.
       const targetLeft = clamped >= maxIndex ? maxScrollLeft : Math.min(targetStart, maxScrollLeft);
       scrollElement.scrollTo({ behavior: 'smooth', left: targetLeft });
       emitMoved(clamped);
@@ -89,9 +105,9 @@ export function useSlider({ options, onMounted, onDestroy }: UseSliderParams): S
   const prev = useCallback(() => goTo('<'), [goTo]);
   const next = useCallback(() => goTo('>'), [goTo]);
 
-  const reachableCount = useReachableCount(scrollElementRef, pageCount, resolvedOptions);
+  useReachableCount(scrollElementRef, pageCount, resolvedOptions, setReachableCount);
   useScrollSync(scrollElementRef, currentIndexRef, emitMoved);
-  const isLastChildVisible = useLastChildVisibility(scrollElementRef, pageCount);
+  useLastChildVisibility(scrollElementRef, pageCount, setIsLastChildVisible);
   useImperativeApi(currentIndexRef, listenersRef, goTo, onMounted, onDestroy);
 
   const perStep = resolvePerStep(resolvedOptions);

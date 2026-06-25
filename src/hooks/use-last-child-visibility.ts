@@ -1,14 +1,13 @@
 'use client';
-import { type RefObject, useEffect, useState } from 'react';
+import { type RefObject, useEffect } from 'react';
 
 const FULL_VISIBILITY_TOLERANCE_PX = 1;
 
 export function useLastChildVisibility(
   scrollElementRef: RefObject<HTMLDivElement | null>,
-  pageCount: number
-): boolean {
-  const [isLastChildVisible, setIsLastChildVisible] = useState(false);
-
+  pageCount: number,
+  setIsLastChildVisible: (visible: boolean) => void
+): void {
   // biome-ignore lint/correctness/useExhaustiveDependencies: pageCount is a re-run trigger — the last child element changes when the page count changes, so the effect must re-run to (re)observe it.
   useEffect(() => {
     const scrollElement = scrollElementRef.current;
@@ -43,7 +42,7 @@ export function useLastChildVisibility(
     return () => {
       observer.disconnect();
     };
-  }, [scrollElementRef, pageCount]);
+  }, [scrollElementRef, pageCount, setIsLastChildVisible]);
 
-  return isLastChildVisible;
+  // Note: `setIsLastChildVisible` is wrapped in useCallback by the caller, so it is stable.
 }

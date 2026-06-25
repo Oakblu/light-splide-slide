@@ -1,15 +1,14 @@
 'use client';
-import { type RefObject, useCallback, useEffect, useState } from 'react';
+import { type RefObject, useCallback, useEffect } from 'react';
 import { readPageGeometry } from '../page-geometry';
 import type { SliderOptions } from '../types';
 
 export function useReachableCount(
   scrollElementRef: RefObject<HTMLDivElement | null>,
   pageCount: number,
-  resolvedOptions: SliderOptions
-): number | null {
-  const [reachableCount, setReachableCount] = useState<number | null>(null);
-
+  resolvedOptions: SliderOptions,
+  setReachableCount: (count: number | null) => void
+): void {
   const measure = useCallback(() => {
     const scrollElement = scrollElementRef.current;
     if (!scrollElement) {
@@ -18,7 +17,7 @@ export function useReachableCount(
     }
     const { pages, reachableCount: count } = readPageGeometry(scrollElement);
     setReachableCount(pages.length ? count : null);
-  }, [scrollElementRef]);
+  }, [scrollElementRef, setReachableCount]);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: pageCount and resolvedOptions are re-measure triggers — the layout (and thus reachable count) changes when they change.
   useEffect(() => {
@@ -36,6 +35,4 @@ export function useReachableCount(
       window.removeEventListener('resize', measure);
     };
   }, [measure, pageCount, resolvedOptions]);
-
-  return reachableCount;
 }
