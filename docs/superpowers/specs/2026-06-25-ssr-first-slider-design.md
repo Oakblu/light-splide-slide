@@ -164,7 +164,7 @@ Behavior is preserved; a small number of assertions change because the wiring ch
   `<SliderArrows>` / `<SliderPagination>`).
 - Removing the imperative API (`onMounted`, `on('moved')`).
 
-## Constraints carried from CLAUDE.md
+## Constraints carried from the project guide
 
 - TDD-first; coverage gate ≥99%.
 - No `any`/`unknown`/type assertions (except `as const`) and no non-null assertions, in source and

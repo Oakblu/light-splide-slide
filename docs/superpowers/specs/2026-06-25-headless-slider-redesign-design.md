@@ -22,7 +22,7 @@ slider it must shed those assumptions:
    `window.innerWidth` on the client, changing resolved options and risking hydration
    mismatch.
 
-Also missing: a `CLAUDE.md`, and one-step version-bump + npm-publish commands.
+Also missing: a `the project guide`, and one-step version-bump + npm-publish commands.
 
 ## Goals & Non-Goals
 
@@ -37,7 +37,7 @@ Also missing: a `CLAUDE.md`, and one-step version-bump + npm-publish commands.
 - **Strict TypeScript**: no `any`, no `unknown`, no type assertions (`as` / `<T>x`, except
   `as const`), no non-null assertions (`!`) — in source and tests. Cast-free patterns only.
 - **≥ 99% test coverage** (lines, statements, functions, branches), enforced in CI.
-- Tooling: **Biome** (lint/format), **tsup** (build), one-step release scripts, `CLAUDE.md`,
+- Tooling: **Biome** (lint/format), **tsup** (build), one-step release scripts, `the project guide`,
   rewritten comprehensive `README`.
 
 **Non-Goals**
@@ -206,7 +206,7 @@ under threshold. Genuinely untestable lines use an explicit, commented `/* v8 ig
 - `.github/workflows/ci.yml`: lint + typecheck + tests + coverage on PRs
   (optional publish-on-tag).
 
-**CLAUDE.md** documents: three-layer architecture + dependency direction, TDD-first rule,
+**the project guide** documents: three-layer architecture + dependency direction, TDD-first rule,
 99% coverage gate, node-vs-browser test split, headless/no-fixed-colors styling contract,
 and the release commands.
 

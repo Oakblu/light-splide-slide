@@ -8,8 +8,7 @@
       "!**/.next",
       "!**/coverage",
       "!**/node_modules",
-      "!**/examples/vite-demo",
-      "!**/.claude"
+      "!**/examples/vite-demo"
     ]
   },
   "formatter": { "enabled": true, "indentStyle": "space", "indentWidth": 2, "lineWidth": 100 },

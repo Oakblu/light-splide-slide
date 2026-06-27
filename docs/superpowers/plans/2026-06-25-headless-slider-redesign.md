@@ -95,7 +95,7 @@ config/docs:
   vitest.setup.browser.ts
   package.json (rewritten scripts/exports/deps)
   tsconfig.json (updated)
-  CLAUDE.md
+  the project guide
   README.md (rewritten)
   .github/workflows/ci.yml
   examples/BasicSliderExample.tsx (rewritten, headless)
@@ -2083,12 +2083,12 @@ Expected: PASS; coverage report shows **≥99%** on lines/statements/functions/b
 
 ---
 
-## Task 16: Example, README, CLAUDE.md, CI
+## Task 16: Example, README, the project guide, CI
 
 **Files:**
 - Modify: `examples/BasicSliderExample.tsx`
 - Rewrite: `README.md`
-- Create: `CLAUDE.md`, `.github/workflows/ci.yml`
+- Create: `the project guide`, `.github/workflows/ci.yml`
 
 **Interfaces:** documentation only; example imports from `../src`.
 
@@ -2129,10 +2129,10 @@ export default BasicSliderExample;
 
 - [ ] **Step 2: Rewrite `README.md`** with sections: intro (headless, SSR, dependency-light); install; quickstart; **styling with each system** (Tailwind via `className`, CSS Modules, styled-components wrapping with render props, vanilla CSS via `data-*`, inline `style`); optional baseline stylesheet (`import 'light-splide-slide/styles.css'`); CSS-variable theming table (`--slider-arrow-*`, `--slider-dot-*`, `--slider-gap`); components & props tables; `SliderOptions` table (pruned list); `data-*` attribute reference; imperative API (`onMounted`); `useSlider` custom-build recipe; SSR notes (no window in render; `useSyncExternalStore`).
 
-- [ ] **Step 3: Create `CLAUDE.md`**
+- [ ] **Step 3: Create `the project guide`**
 
 ```markdown
-# CLAUDE.md — light-splide-slide
+# the project guide — light-splide-slide
 
 Headless, SSR-safe React slider on native scroll-snap.
 
@@ -2192,13 +2192,13 @@ jobs:
 
 - [ ] **Step 5: Verify** — `pnpm lint && pnpm typecheck && pnpm test:cov && pnpm build` → all PASS, coverage ≥99%.
 
-- [ ] **Step 6: Commit** — `git add -A && git commit -m "docs: rewrite README/example, add CLAUDE.md + CI"`
+- [ ] **Step 6: Commit** — `git add -A && git commit -m "docs: rewrite README/example, add the project guide + CI"`
 
 ---
 
 ## Self-Review Notes (addressed)
 
-- **Spec coverage:** Tailwind removal + className/style (Tasks 9–12, 14), extendability/no-fixed-colors (Tasks 9–12, 15; render props in 11–12; `data-*` everywhere), tests/99% (Tasks 1–14), README (16), SSR (Tasks 6, 8), CLAUDE.md (16), release commands (Task 1), Biome (Task 1). All mapped.
+- **Spec coverage:** Tailwind removal + className/style (Tasks 9–12, 14), extendability/no-fixed-colors (Tasks 9–12, 15; render props in 11–12; `data-*` everywhere), tests/99% (Tasks 1–14), README (16), SSR (Tasks 6, 8), the project guide (16), release commands (Task 1), Biome (Task 1). All mapped.
 - **Magic strings removed:** `noArrows`→`hideOnMobile` prop, `splideNav--top`→`placement="top"` (Task 11).
 - **Type consistency:** `SliderContextValue` (Task 3) adds `currentPageIndex` consumed by `useSlider` (Task 8) and `SliderPagination` (Task 12); `registerScrollElement`/`setPageCount` names consistent across Tasks 3/8/9.
 - **Known ordering dependency:** Task 9's test depends on `SliderSlide` (Task 10) — flagged in Task 9 Step 1; implement Task 10's component before running Task 9's test, or run them as a pair.
