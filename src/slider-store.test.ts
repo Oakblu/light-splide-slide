@@ -58,10 +58,4 @@ describe('createSliderStore', () => {
     store.setState({ pageCount: 9 });
     expect(listener).not.toHaveBeenCalled();
   });
-
-  it('getState returns the current live state', () => {
-    const store = createSliderStore();
-    store.setState({ isLastChildVisible: true });
-    expect(store.getState().isLastChildVisible).toBe(true);
-  });
 });

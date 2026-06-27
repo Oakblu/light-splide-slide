@@ -23,9 +23,9 @@ export function useReachableCount(
   useEffect(() => {
     measure();
     const scrollElement = scrollElementRef.current;
-    if (!scrollElement || typeof ResizeObserver === 'undefined') {
-      window.addEventListener('resize', measure);
-      return () => window.removeEventListener('resize', measure);
+    // v8 ignore next 3 -- ref is always set before effects run; guard is defensive for the unmount edge case
+    if (!scrollElement) {
+      return;
     }
     const observer = new ResizeObserver(() => measure());
     observer.observe(scrollElement);

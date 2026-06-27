@@ -2,12 +2,7 @@ import type { CSSProperties } from 'react';
 import type { SliderOptions } from '../types';
 import { toCssUnit } from './units';
 
-export type ScrollStyleResult = {
-  style: CSSProperties;
-  cssVars: Record<`--${string}`, string>;
-};
-
-export function computeScrollStyle(options: SliderOptions): ScrollStyleResult {
+export function computeScrollStyle(options: SliderOptions): CSSProperties {
   const gap = toCssUnit(options.gap) ?? '0px';
   const hasPadding = options.padding !== undefined;
   const pad =
@@ -17,7 +12,7 @@ export function computeScrollStyle(options: SliderOptions): ScrollStyleResult {
   const paddingLeft = toCssUnit(pad?.left) ?? '0px';
   const paddingRight = toCssUnit(pad?.right) ?? '0px';
 
-  const style: CSSProperties = {
+  return {
     display: 'flex',
     scrollSnapType: 'x mandatory',
     overflowX: 'auto',
@@ -36,12 +31,4 @@ export function computeScrollStyle(options: SliderOptions): ScrollStyleResult {
       : {}),
     ...(options.drag === false ? { touchAction: 'pan-y' } : {}),
   };
-
-  const cssVars: Record<`--${string}`, string> = {
-    '--slider-gap': gap,
-    '--slider-padding-left': paddingLeft,
-    '--slider-padding-right': paddingRight,
-  };
-
-  return { style, cssVars };
 }

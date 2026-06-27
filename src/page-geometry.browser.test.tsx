@@ -22,7 +22,6 @@ it('reads pages, offsets, reachable count and maxIndex', () => {
   }
   const geo = readPageGeometry(el);
   expect(geo.pages.length).toBe(3);
-  expect(geo.offsets.length).toBe(3);
   expect(geo.reachableCount).toBeGreaterThanOrEqual(1);
   expect(geo.maxIndex).toBe(geo.reachableCount - 1);
   expect(geo.maxScrollLeft).toBeGreaterThanOrEqual(0);

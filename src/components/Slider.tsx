@@ -1,12 +1,8 @@
 import { Children, type CSSProperties, cloneElement, isValidElement, useId } from 'react';
-import { computeScrollStyle, DEFAULTS, mergeOptions, resolveOptions, toCssUnit } from '../core';
+import { DEFAULTS, mergeOptions, resolveOptions, slideWidthExpr, toCssUnit } from '../core';
 import type { SliderInjectedOptions, SliderOptions, SliderProps } from '../types';
 import { SliderRuntime } from './SliderRuntime';
 import { SliderTrack } from './SliderTrack';
-
-function slideWidthExpr(perPage: number, gap: string): string {
-  return `calc((100% - (${gap} * ${Math.max(perPage - 1, 0)})) / ${perPage})`;
-}
 
 function generateBreakpointCSS(scopeId: string, options: SliderOptions): string {
   if (!options.breakpoints || !Object.keys(options.breakpoints).length) {
@@ -75,10 +71,8 @@ export function Slider({
   const uid = useId();
   const scopeId = uid.replace(/:/g, '');
   const resolved = resolveOptions(options ?? {}, null);
-  const { cssVars } = computeScrollStyle(resolved);
-  const sectionStyle: CSSProperties & Record<`--${string}`, string> = {
+  const sectionStyle: CSSProperties = {
     position: 'relative',
-    ...cssVars,
     ...style,
   };
   const breakpointCSS = generateBreakpointCSS(scopeId, options ?? {});

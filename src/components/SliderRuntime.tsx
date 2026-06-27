@@ -53,12 +53,9 @@ export function SliderRuntime({ options, onMounted, onDestroy, children }: Slide
     if (!scroll) {
       return;
     }
-    const { style, cssVars } = computeScrollStyle(resolvedOptions);
+    const style = computeScrollStyle(resolvedOptions);
     for (const [key, value] of Object.entries(style)) {
       scroll.style.setProperty(camelToKebab(key), String(value));
-    }
-    for (const [key, value] of Object.entries(cssVars)) {
-      scroll.style.setProperty(key, value);
     }
   }, [resolvedOptions]);
 

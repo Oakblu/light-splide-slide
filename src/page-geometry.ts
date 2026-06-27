@@ -2,7 +2,6 @@ import { getReachablePageCount } from './core';
 
 export type PageGeometry = {
   pages: HTMLElement[];
-  offsets: number[];
   maxScrollLeft: number;
   reachableCount: number;
   maxIndex: number;
@@ -16,5 +15,5 @@ export function readPageGeometry(scrollElement: HTMLElement): PageGeometry {
   const offsets = pages.map((page) => page.offsetLeft);
   const maxScrollLeft = scrollElement.scrollWidth - scrollElement.clientWidth;
   const reachableCount = getReachablePageCount(offsets, maxScrollLeft);
-  return { pages, offsets, maxScrollLeft, reachableCount, maxIndex: reachableCount - 1 };
+  return { pages, maxScrollLeft, reachableCount, maxIndex: reachableCount - 1 };
 }

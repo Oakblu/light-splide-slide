@@ -1,9 +1,10 @@
 import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
 
-export enum NavigationAction {
-  Next = 'next',
-  Prev = 'prev',
-}
+export const NavigationAction = {
+  Next: 'next',
+  Prev: 'prev',
+} as const;
+export type NavigationAction = (typeof NavigationAction)[keyof typeof NavigationAction];
 
 export type SliderControl =
   | number

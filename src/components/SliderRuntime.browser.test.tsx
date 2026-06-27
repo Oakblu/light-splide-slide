@@ -64,6 +64,5 @@ it('applies scroll styles imperatively from resolved options on mount', async ()
   await vi.waitFor(() => {
     expect(scroll.style.gap).toBe('12px');
     expect(scroll.style.paddingLeft).toBe('20px');
-    expect(scroll.style.getPropertyValue('--slider-gap')).toBe('12px');
   });
 });

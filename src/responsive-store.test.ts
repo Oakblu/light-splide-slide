@@ -52,40 +52,11 @@ describe('createResponsiveStore', () => {
     const unsub = store.subscribe(() => {});
     expect(() => unsub()).not.toThrow();
   });
-  it('notifies on resize when window exists', () => {
-    const listeners = new Set<() => void>();
-    const fakeWindow = {
-      innerWidth: 800,
-      addEventListener: (_: string, cb: () => void) => listeners.add(cb),
-      removeEventListener: (_: string, cb: () => void) => listeners.delete(cb),
-    };
+  it('getSnapshot reads the live window width when called before subscribe', () => {
+    const { fakeWindow } = makeFakeWindow(800);
     vi.stubGlobal('window', fakeWindow);
-    const store = createResponsiveStore();
+    const store = createResponsiveStore([640]);
     expect(store.getSnapshot()).toBe(800);
-    const cb = vi.fn();
-    store.subscribe(cb);
-    fakeWindow.innerWidth = 400;
-    for (const l of listeners) {
-      l();
-    }
-    expect(cb).toHaveBeenCalled();
-    vi.unstubAllGlobals();
-  });
-
-  it('unsubscribe removes the resize listener when window exists', () => {
-    const listeners = new Set<() => void>();
-    const fakeWindow = {
-      innerWidth: 1024,
-      addEventListener: (_: string, cb: () => void) => listeners.add(cb),
-      removeEventListener: (_: string, cb: () => void) => listeners.delete(cb),
-    };
-    vi.stubGlobal('window', fakeWindow);
-    const store = createResponsiveStore();
-    const cb = vi.fn();
-    const unsub = store.subscribe(cb);
-    expect(listeners.size).toBe(1);
-    unsub();
-    expect(listeners.size).toBe(0);
     vi.unstubAllGlobals();
   });
 });
@@ -128,29 +99,6 @@ describe('createResponsiveStore (matchMedia)', () => {
     const unsub = store.subscribe(vi.fn());
     expect(queries).toEqual(['(min-width: 640px)']);
     unsub();
-    vi.unstubAllGlobals();
-  });
-
-  it('falls back to resize when matchMedia is absent', () => {
-    const listeners = new Set<() => void>();
-    const fakeWindow = {
-      innerWidth: 900,
-      addEventListener: (_: string, cb: () => void) => listeners.add(cb),
-      removeEventListener: (_: string, cb: () => void) => listeners.delete(cb),
-    };
-    vi.stubGlobal('window', fakeWindow);
-    const store = createResponsiveStore([640]);
-    const cb = vi.fn();
-    const unsub = store.subscribe(cb);
-    expect(listeners.size).toBe(1);
-    fakeWindow.innerWidth = 400;
-    for (const l of listeners) {
-      l();
-    }
-    expect(cb).toHaveBeenCalled();
-    expect(store.getSnapshot()).toBe(400);
-    unsub();
-    expect(listeners.size).toBe(0);
     vi.unstubAllGlobals();
   });
 });

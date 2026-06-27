@@ -5,6 +5,10 @@ import {
   type SliderOptions,
 } from '../types';
 
+export function slideWidthExpr(perPage: number, gap: string): string {
+  return `calc((100% - (${gap} * ${Math.max(perPage - 1, 0)})) / ${perPage})`;
+}
+
 export function getGridDimensions(grid?: SliderGrid) {
   const dimensions = grid?.dimensions;
   if (!dimensions?.length) {

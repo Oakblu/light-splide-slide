@@ -238,26 +238,6 @@ it('user style merges onto outer wrapper without removing overflow: hidden', () 
   expect(outer.style.padding).toBe('4px');
 });
 
-it('scroll container exposes CSS custom properties for gap and padding', () => {
-  const { container } = makeSlider({ gap: '12px', padding: { left: '20px', right: '10px' } }, 2);
-  const scroll = container.querySelector<HTMLElement>('[data-slider-scroll]');
-  if (!scroll) throw new Error('scroll element not found');
-  const style = getComputedStyle(scroll);
-  expect(style.getPropertyValue('--slider-gap').trim()).toBe('12px');
-  expect(style.getPropertyValue('--slider-padding-left').trim()).toBe('20px');
-  expect(style.getPropertyValue('--slider-padding-right').trim()).toBe('10px');
-});
-
-it('CSS custom properties default to 0px when gap and padding are not set', () => {
-  const { container } = makeSlider({}, 2);
-  const scroll = container.querySelector<HTMLElement>('[data-slider-scroll]');
-  if (!scroll) throw new Error('scroll element not found');
-  const style = getComputedStyle(scroll);
-  expect(style.getPropertyValue('--slider-gap').trim()).toBe('0px');
-  expect(style.getPropertyValue('--slider-padding-left').trim()).toBe('0px');
-  expect(style.getPropertyValue('--slider-padding-right').trim()).toBe('0px');
-});
-
 it('padding option also sets scrollPaddingLeft and scrollPaddingRight', () => {
   const { container } = makeSlider({ padding: { left: '20px', right: '10px' } }, 2);
   const scroll = container.querySelector<HTMLElement>('[data-slider-scroll]');

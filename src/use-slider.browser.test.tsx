@@ -243,32 +243,6 @@ it('goTo: a target beyond the reachable range clamps to the last reachable page'
   expect(api.current?.index).toBe(1);
 });
 
-it('IntersectionObserver fallback: uses scroll/resize when IO is undefined', async () => {
-  vi.stubGlobal('IntersectionObserver', undefined);
-  function IO_Probe() {
-    const ctx = useSlider({ options: { perPage: 1 } });
-    useEffect(() => {
-      ctx.setPageCount(1);
-    }, [ctx.setPageCount]);
-    return (
-      <div
-        ref={ctx.registerScrollElement}
-        style={{ display: 'flex', width: 200, overflowX: 'auto' }}
-      >
-        <div data-carousel-page="true" style={{ flex: '0 0 200px', width: 200, height: 50 }}>
-          only
-        </div>
-      </div>
-    );
-  }
-  const { unmount } = render(<IO_Probe />);
-  // trigger resize so the fallback listener fires
-  window.dispatchEvent(new Event('resize'));
-  // no error thrown; cleanup removes listeners
-  unmount();
-  vi.unstubAllGlobals();
-});
-
 it('breakpoints: resolves options at given viewport width', () => {
   const captured: { current: SliderContextValue | null } = { current: null };
   function Probe() {

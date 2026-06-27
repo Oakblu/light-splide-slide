@@ -165,15 +165,3 @@ it('a scroll with no pages present is a no-op (does not throw)', async () => {
   await new Promise((resolve) => setTimeout(resolve, 200));
   expect(captured.ctx?.currentIndex).toBe(0);
 });
-
-it('measures reachable pages via window resize when ResizeObserver is unavailable', async () => {
-  vi.stubGlobal('ResizeObserver', undefined);
-  try {
-    const { container } = renderFixed(500, '200px', 5);
-    await vi.waitFor(() => {
-      expect(container.querySelectorAll('[data-slider-dot]')).toHaveLength(3);
-    });
-  } finally {
-    vi.unstubAllGlobals();
-  }
-});

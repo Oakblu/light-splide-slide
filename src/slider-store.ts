@@ -9,7 +9,6 @@ export type SliderStore = {
   subscribe: (callback: () => void) => () => void;
   getSnapshot: () => SliderState;
   getServerSnapshot: () => SliderState;
-  getState: () => SliderState;
   setState: (patch: Partial<SliderState>) => void;
 };
 
@@ -36,9 +35,6 @@ export function createSliderStore(): SliderStore {
     },
     getServerSnapshot() {
       return INITIAL_STATE;
-    },
-    getState() {
-      return state;
     },
     setState(patch) {
       const next: SliderState = {

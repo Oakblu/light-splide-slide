@@ -67,12 +67,8 @@ export function SliderTrack({
   const gridDimensions = getGridDimensions(options.grid);
   const pages = groupPages(children, cssGridRows, options);
 
-  const { style: scrollBaseStyle, cssVars: scrollCssVars } = computeScrollStyle(options);
+  const scrollStyle = computeScrollStyle(options);
   const gap = toCssUnit(options.gap) ?? '0px';
-  const scrollStyle: CSSProperties & Record<`--${string}`, string> = {
-    ...scrollBaseStyle,
-    ...scrollCssVars,
-  };
 
   const renderGroupedPage = (page: ReactElement[], pageIndex: number) => {
     // v8 ignore next -- Children.toArray always assigns keys; `?? pageIndex` is unreachable

@@ -1,6 +1,6 @@
 // src/components/SliderSlide.tsx
 import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
-import { toCssUnit } from '../core';
+import { slideWidthExpr, toCssUnit } from '../core';
 import type { SliderInjectedOptions } from '../types';
 
 type SliderSlideProps = HTMLAttributes<HTMLDivElement> &
@@ -42,9 +42,7 @@ export function SliderSlide({
   const gap = toCssUnit(__sliderOptions.gap) ?? '0px';
   // v8 ignore next -- perPage is always set by resolveOptions defaults; `?? 1` is unreachable
   const perPage = __sliderOptions.perPage ?? 1;
-  const width = fixedWidth
-    ? fixedWidth
-    : `calc((100% - (${gap} * ${Math.max(perPage - 1, 0)})) / ${perPage})`;
+  const width = fixedWidth ? fixedWidth : slideWidthExpr(perPage, gap);
   const slideStyle: CSSProperties = {
     minWidth: 0,
     flexShrink: 0,

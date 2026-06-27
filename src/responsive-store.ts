@@ -21,10 +21,6 @@ export function createResponsiveStore(
         cachedWidth = readWidth();
         callback();
       };
-      if (typeof window.matchMedia === 'undefined') {
-        window.addEventListener('resize', handler);
-        return () => window.removeEventListener('resize', handler);
-      }
       const dir = mediaQuery === 'min' ? 'min-width' : 'max-width';
       const mqls = breakpointWidths.map((w) => window.matchMedia(`(${dir}: ${w}px)`));
       for (const mql of mqls) {
