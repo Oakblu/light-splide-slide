@@ -48,25 +48,28 @@
     "prepare:publish": "pnpm lint:fix && pnpm format && pnpm test && pnpm build && pnpm check",
     "release:patch": "pnpm prepare:publish && npm version patch && npm publish && git push --follow-tags",
     "release:minor": "pnpm prepare:publish && npm version minor && npm publish && git push --follow-tags",
-    "release:major": "pnpm prepare:publish && npm version major && npm publish && git push --follow-tags"
+    "release:major": "pnpm prepare:publish && npm version major && npm publish && git push --follow-tags",
+    "update:packages": "ncu -u"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.1",
+    "@biomejs/biome": "^2.5.3",
     "@size-limit/preset-small-lib": "^12.1.0",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.3.2",
-    "@types/react": "^19.2.15",
+    "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
-    "@vitest/browser": "^4.1.9",
-    "@vitest/browser-playwright": "^4.1.9",
-    "@vitest/coverage-v8": "^4.1.9",
+    "@vitest/browser": "^4.1.10",
+    "@vitest/browser-playwright": "^4.1.10",
+    "@vitest/coverage-v8": "^4.1.10",
+    "npm-check-updates": "^22.2.9",
     "playwright": "^1.61.1",
-    "react": "19.2.6",
-    "react-dom": "19.2.6",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
     "size-limit": "^12.1.0",
     "tsup": "^8.5.1",
-    "typescript": "^6.0.3",
-    "vitest": "^4.1.9"
+    "@typescript/native": "npm:typescript@^7.0.2",
+    "typescript": "npm:@typescript/typescript6@^6.0.2",
+    "vitest": "^4.1.10"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
